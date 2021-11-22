@@ -1,0 +1,17 @@
+{
+    "name": "danny/diy_framework",
+    "autoload": {
+        "psr-4": {
+            "app\\": "./"
+        }
+    },
+    "authors": [
+        {
+            "name": "Danny Haslund",
+            "email": "dannyhasl1@gmail.com"
+        }
+    ],
+    "require": {
+        "vlucas/phpdotenv": "^5.4"
+    }
+}
