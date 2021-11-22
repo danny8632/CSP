@@ -25,9 +25,9 @@ class ContactForm extends Model
     public function labels(): array
     {
         return [
-            'email' => 'Email',
+            'email'   => 'Email',
             'subject' => 'Subject',
-            'body' => 'Body texts',
+            'body'    => 'Body texts',
         ];
     }
 
