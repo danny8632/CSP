@@ -100,10 +100,6 @@ class Router
             throw new NotFoundException();
         }
 
-        if (is_string($callback)) {
-            return Application::$app->view->renderView($callback);
-        }
-
         if (is_array($callback)) {
             /** @var \app\core\Controller $controller */
             $controller = new $callback[0]();

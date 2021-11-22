@@ -15,14 +15,6 @@ use app\core\middlewares\BaseMiddleware;
 class Controller
 {
     /**
-     * The layout that the view is going to be rendered in.
-     * @default main
-     *
-     * @var string
-     */
-    public string $layout = 'main';
-
-    /**
      * The actual function of the controller that is being called
      * when the router->resolve() function is being called.
      * This is also set in the Router class. 
@@ -38,34 +30,6 @@ class Controller
      * @var BaseMiddleware[]
      */
     protected array $middlewares = [];
-
-
-    /**
-     * This is a setter for the layout if the default layout is not wanted.
-     *
-     * @param string $layout The name of the layout/file in the views/layouts folder
-     * @return void
-     */
-    public function setLayout(string $layout): void
-    {
-        $this->layout = $layout;
-    }
-
-
-    /**
-     * Helper function to easy call renderView from the view class.
-     *
-     * @param string $view The name of the view/file from the views folder
-     * @param array $params The params should be a key-value array where the key is
-     * the desired variable name that is going to be accessible in the view file.
-     * So if the params is [ 'meme' => 4 ]. Then the $meme variable will contain 4.
-     * 
-     * @return string
-     */
-    public function render(string $view, array $params = []): string
-    {
-        return Application::$app->view->renderView($view, $params);
-    }
 
 
     /**

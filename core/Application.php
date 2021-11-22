@@ -17,13 +17,6 @@ class Application
     public static string $ROOT_DIR;
 
     /**
-     * This is the main layout for rendering.
-     *
-     * @var string
-     */
-    public string $layout = 'main';
-
-    /**
      * This is the name of the model that is the main usercase.
      * This is used to get the user data that's logged in.
      *
@@ -85,13 +78,6 @@ class Application
     public ?UserModel $user;
 
     /**
-     * View handles rendering of layout and view.
-     *
-     * @var View
-     */
-    public View $view;
-
-    /**
      * This is used to have a static refrence to the Application at all time
      *
      * @var Application
@@ -116,7 +102,6 @@ class Application
         $this->response = new Response();
         $this->session  = new Session();
         $this->router   = new Router($this->request, $this->response);
-        $this->view     = new View();
         $this->db       = new Database($config['db']);
 
 
