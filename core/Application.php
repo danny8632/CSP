@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace app\core;
 
 use app\core\db\Database;
+use app\models\User;
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 
 
 class Application
@@ -25,6 +28,18 @@ class Application
      * @var string
      */
     public string $userClass;
+
+    /**
+     * This is the auth key. This is top secret and is set in .env
+     *
+     * @var string
+     */
+    private string $authKey = '';
+
+    /**
+     * This is the chosen algorithms for encrypting the JWT
+     */
+    private const ALGORITHM = 'HS256';
 
     /**
      * The router that does all the routes
@@ -75,7 +90,7 @@ class Application
      *
      * @var UserModel|null
      */
-    public ?UserModel $user;
+    public ?UserModel $user = null;
 
     /**
      * This is used to have a static refrence to the Application at all time
@@ -95,6 +110,7 @@ class Application
     {
         //  Initilizing all class variables to be access later
         $this->userClass = $config['userClass'] ?? '';
+        $this->authKey   = $config['auth_key'] ?? '';
         self::$ROOT_DIR  = $rootPath;
         self::$app       = $this;
 
@@ -105,14 +121,9 @@ class Application
         $this->db       = new Database($config['db']);
 
 
-        //  Sets the user object if the session has the users primaryValue(the Id of the record in db)
-        //  else the user will be set to null and this is a guest login
-        $primaryValue = $this->session->get('user');
-        if ($primaryValue) {
-            $primaryKey = (new $this->userClass)->primaryKey();
-            $this->user = $this->userClass::findOne([$primaryKey => $primaryValue]);
-        } else {
-            $this->user = null;
+        //  Finds the actual user from the token
+        if($this->request->getAuthToken() !== false) {
+            $this->auth($this->request->getAuthToken());
         }
     }
 
@@ -126,11 +137,13 @@ class Application
      */
     public function run(): void
     {
+        $this->response->setJsonType();
+
         try {
             echo $this->router->resolve();
         } catch (\Exception $e) {
             $this->response->setStatusCode($e->getCode());
-            echo "Not found";
+            echo $e->getMessage();
         }
     }
 
@@ -140,14 +153,51 @@ class Application
      * into the session so it can be fetched on later requests.
      *
      * @param UserModel $user
-     * @return boolean returns true if the session was successfully saved
+     * @return string jwt token
      */
-    public function login(UserModel $user): bool
+    public function login(UserModel $user): string
     {
-        $this->user = $user;
-        $this->session->set('user', $user->{$user->primaryKey()});
+        $iat = time();
+        $exp = $iat + 60;
 
-        return true;
+        $token = JWT::encode([
+                "iss" => "http://localhost",
+                "aud" => "http://localhost",
+                "iat" => $iat,
+                "exp" => $exp,
+                'user' => $user
+            ],
+            $this->authKey,
+            self::ALGORITHM
+        );
+
+        $this->user = $user;
+        return $token;
+    }
+
+
+    /**
+     * This function will authenticate the user based on the token.
+     *
+     * @param string $token The JWT token
+     * @return void
+     */
+    public function auth(string $token): void
+    {
+        $this->response->setJsonType();
+
+        try {
+            $token = JWT::decode($token, new Key($this->authKey, 'HS256'));
+
+            $user = new User();
+            $user->loadData(get_object_vars($token->user));
+
+            $this->user = $user;
+
+        } catch (\Exception $e) {
+            $this->response->setStatusCode($e->getCode());
+            echo $e->getMessage();
+        }
     }
 
 
@@ -160,8 +210,6 @@ class Application
     public function logout(): bool
     {
         $this->user = null;
-        $this->session->remove('user');
-
         return true;
     }
 
@@ -173,6 +221,6 @@ class Application
      */
     public static function isGuest(): bool
     {
-        return !self::$app->user;
+        return is_null(self::$app->user);
     }
 }

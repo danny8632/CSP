@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace app\controllers;
 
 use app\core\Application;
@@ -14,9 +16,8 @@ class AuthController extends Controller
 {
     public function __construct()
     {
-        $this->registerMiddleware(new AuthMiddleware(['profile', 'user']));
+        $this->registerMiddleware(new AuthMiddleware(['user']));
     }
-
 
     public function login(Request $request, Response $response)
     {
@@ -27,23 +28,20 @@ class AuthController extends Controller
         {
             $loginForm->loadData($request->getBody());
 
-            if($loginForm->validate() && $loginForm->login())
+            if($loginForm->validate() && $token = $loginForm->login())
             {
-                $response->redirect('/');
-                return;
+                return [
+                    'token' => $token
+                ];
             }
+
+            return $loginForm->formatErrors();
         }
-
-        /* return $this->render('login', [
-            'model' => $loginForm
-        ]); */
     }
-
 
     public function register(Request $request)
     {
         $user = new User();
-
 
         if($request->isPost())
         {
@@ -51,38 +49,18 @@ class AuthController extends Controller
 
             if($user->validate() && $user->save())
             {
-                Application::$app->session->setFlash('success', 'Thanks for signing up');
-                Application::$app->response->redirect('/');
+                return [
+                    'token' => Application::$app->login($user)
+                ];
             }
 
-
-            /* return $this->render('register', [
-                'model' => $user
-            ]); */
+            return $user->formatErrors();
         }
-
-
-        /* return $this->render('register', [
-            'model' => $user
-        ]); */
-    }
-
-
-    public function logout(Request $request, Response $response)
-    {
-        Application::$app->logout();
-        $response->redirect('/');
-    }
-
-
-    public function profile()
-    {
-        //return $this->render('profile');
     }
 
 
     public function user()
     {
-        return json_encode(Application::$app->user);
+        return Application::$app->user;
     }
 }

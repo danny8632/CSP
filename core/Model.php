@@ -211,7 +211,7 @@ abstract class Model
      */
     public function hasError(string $property): bool
     {
-        return $this->errors[$property] ?? false;
+        return isset($this->errors[$property]);
     }
 
 
@@ -225,5 +225,19 @@ abstract class Model
     public function getFirstError(string $property): string|bool
     {
         return $this->errors[$property][0] ?? false;
+    }
+
+
+    public function formatErrors(): array
+    {
+        $response = [];
+
+        foreach (get_object_vars($this) as $key => $value) {
+            if ($this->hasError($key)) {
+                $response[$key] = $this->getFirstError($key);
+            }
+        }
+
+        return $response;
     }
 }

@@ -8,14 +8,14 @@ use app\core\Model;
 
 class LoginForm extends Model
 {
-    public string $email = '';
+    public string $email    = '';
     public string $password = '';
 
 
     public function rules(): array
     {
         return [
-            'email' => [self::RULE_REQUIRED, self::RULE_EMAIL],
+            'email'    => [self::RULE_REQUIRED, self::RULE_EMAIL],
             'password' => [self::RULE_REQUIRED],
         ];
     }
@@ -24,13 +24,13 @@ class LoginForm extends Model
     public function labels(): array
     {
         return [
-            'email' => 'Email',
+            'email'    => 'Email',
             'password' => 'Password',
         ];
     }
 
 
-    public function login() : bool
+    public function login() : string|bool
     {
         $user = User::findOne(['email' => $this->email]);
 

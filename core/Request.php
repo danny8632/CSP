@@ -18,7 +18,7 @@ class Request
      */
     public function getPath(): string
     {
-        $path = $_SERVER['REQUEST_URI'] ?? '/';
+        $path = str_replace('/api', '', $_SERVER['REQUEST_URI'] ?? '/');
         $position = strpos($path, '?');
 
         if ($position === false) {
@@ -89,6 +89,40 @@ class Request
             }
         }
 
+        $json = file_get_contents('php://input');
+        if ($json !== false) {
+            $body = array_merge($body, json_decode($json, true));
+        }
+
         return $body;
+    }
+
+
+    /**
+     * Returns all request headers
+     *
+     * @return array list of all headers
+     */
+    public function getHeaders(): array
+    {
+        return getallheaders();
+    }
+
+
+    /**
+     * Returns the JWT token from the header
+     *
+     * @return string|boolean false if theres no token
+     */
+    public function getAuthToken(): string|bool
+    {
+        $headers = $this->getHeaders();
+        $token   = str_replace('Bearer ', '', $headers['Authorization'] ?? '');
+
+        if (strlen($token) === 0) {
+            return false;
+        }
+
+        return $token;
     }
 }

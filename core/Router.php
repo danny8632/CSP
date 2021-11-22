@@ -64,7 +64,7 @@ class Router
      */
     public function get(string $path, $callback): void
     {
-        $this->routes['get']["/api$path"] = $callback;
+        $this->routes['get']["$path"] = $callback;
     }
 
 
@@ -78,7 +78,7 @@ class Router
      */
     public function post(string $path, $callback): void
     {
-        $this->routes['post']["/api$path"] = $callback;
+        $this->routes['post']["$path"] = $callback;
     }
 
 
