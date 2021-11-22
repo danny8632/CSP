@@ -2,6 +2,22 @@
 
 declare(strict_types=1);
 
+/**
+ * This sections is to force the use of the frontend
+ * but only if the uri does not contain api
+ */
+$serverRequestPath = $_SERVER['REQUEST_URI'] ?? '/';
+$isApiCall = strpos($serverRequestPath, 'api');
+
+if($isApiCall === false) {
+    ob_start();
+    include_once "./test.html";
+    echo ob_get_clean();
+    return;
+}
+
+
+
 use app\controllers\SiteController;
 use app\controllers\AuthController;
 use app\core\Application;
@@ -24,6 +40,13 @@ $config = [
 
 $app = new Application(dirname(__DIR__), $config);
 
+
+$app->router->get('/test', function() {
+    return "test";
+});
+
+
+//$app->router->get('/hej', [SiteController::class, 'home']);
 
 /* $app->router->get('/', [SiteController::class, 'home']);
 $app->router->get('/contact', [SiteController::class, 'contact']);

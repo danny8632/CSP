@@ -59,12 +59,12 @@ class Router
      * $router->get('/', [SiteController::class, 'home']);
      *
      * @param string $path The path of the route
-     * @param array|string $callback If it's a string it expects it to be a view otherwise a function in a controller.
+     * @param mixed $callback A callback or an array
      * @return void
      */
-    public function get(string $path, array|string $callback): void
+    public function get(string $path, $callback): void
     {
-        $this->routes['get'][$path] = $callback;
+        $this->routes['get']["/api$path"] = $callback;
     }
 
 
@@ -73,12 +73,12 @@ class Router
      * $router->post('/contact', [SiteController::class, 'contact']);
      *
      * @param string $path The path of the route
-     * @param array|string $callback If it's a string it expects it to be a view otherwise a function in a controller.
+     * @param mixed $callback A callback or an array
      * @return void
      */
-    public function post(string $path, array|string $callback): void
+    public function post(string $path, $callback): void
     {
-        $this->routes['post'][$path] = $callback;
+        $this->routes['post']["/api$path"] = $callback;
     }
 
 
@@ -112,6 +112,7 @@ class Router
             }
         }
 
-        return call_user_func($callback, $this->request, $this->response);
+        $this->response->setJsonType();
+        return json_encode(call_user_func($callback, $this->request, $this->response));
     }
 }

@@ -33,4 +33,13 @@ class Response
     {
         header("Location: $url");
     }
+
+
+    /**
+     * This function will set the data type to be json
+     */
+    public function setJsonType(): void
+    {
+        header('Content-Type: application/json; charset=utf-8');
+    }
 }
