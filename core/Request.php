@@ -105,7 +105,11 @@ class Request
      */
     public function getHeaders(): array
     {
-        return getallheaders();
+        try {
+            return getallheaders();
+        } catch (\Throwable $th) {
+            return [];
+        }
     }
 
 
