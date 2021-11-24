@@ -83,6 +83,20 @@ class Router
 
 
     /**
+     * This function registers all the delete routes. This can be done via:
+     * $router->post('/contact', [SiteController::class, 'contact']);
+     *
+     * @param string $path The path of the route
+     * @param mixed $callback A callback or an array
+     * @return void
+     */
+    public function delete(string $path, $callback): void
+    {
+        $this->routes['delete']["$path"] = $callback;
+    }
+
+
+    /**
      * This function resolves the request and either renders a view
      * or calls a function thats in the $routes array.
      * 

@@ -96,7 +96,7 @@ class Application
     /**
      * This is the logged in user model. The UserModel is set from the $userClass string.
      *
-     * @var UserModel|null
+     * @var User|null
      */
     public ?UserModel $user = null;
 
@@ -169,13 +169,13 @@ class Application
         $jwt = $this->generateJWT($user);
         $this->user = $user;
 
-        $refreshToken = RefreshToken::new($user->id);
+        $refreshToken = RefreshToken::new(intval($user->id));
 
         return [
             'jwt'           => $jwt,
             'refresh_token' => [
                 'token' => $refreshToken->token,
-                'exp'   => $refreshToken->expire->getTimestamp()
+                'exp'   => $refreshToken->expire
             ]
         ];
     }

@@ -18,8 +18,9 @@ if($isApiCall === false) {
 
 
 
-use app\controllers\SiteController;
 use app\controllers\AuthController;
+use app\controllers\DepartmentController;
+use app\controllers\DepartmentRelationController;
 use app\core\Application;
 
 require_once __DIR__.'/../vendor/autoload.php';
@@ -42,29 +43,17 @@ $config = [
 
 $app = new Application(dirname(__DIR__), $config);
 
-
-$app->router->get('/test', function() {
-    return "test";
-});
-
-
-//$app->router->get('/hej', [SiteController::class, 'home']);
-
-/* $app->router->get('/', [SiteController::class, 'home']);
-$app->router->get('/contact', [SiteController::class, 'contact']);
-$app->router->post('/contact', [SiteController::class, 'contact']);
-
-$app->router->get('/login', [AuthController::class, 'login']);
-
-$app->router->get('/register', [AuthController::class, 'register']);
-
-$app->router->get('/logout', [AuthController::class, 'logout']);
-$app->router->get('/profile', [AuthController::class, 'profile']);
-$app->router->get('/user', [AuthController::class, 'user']);
- */
-
 $app->router->post('/login', [AuthController::class, 'login']);
 $app->router->post('/register', [AuthController::class, 'register']);
 $app->router->post('/tokenRefresh', [AuthController::class, 'tokenRefresh']);
+
+$app->router->get('/departmentRelation', [DepartmentRelationController::class, 'get']);
+$app->router->post('/departmentRelation', [DepartmentRelationController::class, 'post']);
+$app->router->delete('/departmentRelation', [DepartmentRelationController::class, 'delete']);
+
+$app->router->get('/department', [DepartmentController::class, 'get']);
+$app->router->post('/department', [DepartmentController::class, 'post']);
+$app->router->delete('/department', [DepartmentController::class, 'delete']);
+
 
 $app->run();

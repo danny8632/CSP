@@ -11,7 +11,7 @@ class User extends UserModel
     const TYPE_EMPLOYEE = 'employee';
     const TYPE_ADMIN    = 'admin';
 
-    public int    $id              = 0;
+    public int    $id              = -1;
     public string $username        = '';
     public string $password        = '';
     public string $confirmPassword = '';
@@ -64,7 +64,7 @@ class User extends UserModel
 
     public function properties(): array
     {
-        return ['username', 'firstname', 'lastname', 'type', 'requiredhours', 'monthlypay'];
+        return ['id', 'username', 'firstname', 'lastname', 'type', 'requiredhours', 'monthlypay'];
     }
 
 
@@ -86,5 +86,10 @@ class User extends UserModel
     public function getDisplayName(): string
     {
         return $this->firstname . ' ' . $this->lastname;
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->type === self::TYPE_ADMIN;
     }
 }

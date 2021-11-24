@@ -2,7 +2,7 @@
 
 use app\core\Application;
 
-class m0008_Default_Users
+class m0009_Default_Departments
 {
     public function up()
     {

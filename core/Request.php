@@ -63,6 +63,17 @@ class Request
 
 
     /**
+     * Helper function to check if the method is a delete
+     *
+     * @return bool true if the method is a delete method
+     */
+    public function isDelete(): bool
+    {
+        return $this->method() === 'delete';
+    }
+
+
+    /**
      * Will return all the request body data sanitized so it's safe to use
      *
      * @return array The sanitized body data
@@ -78,7 +89,7 @@ class Request
             $filterType  = INPUT_GET;
         }
 
-        if ($this->isPost()) {
+        if ($this->isPost() || $this->isDelete()) {
             $requestKeys = array_keys($_POST);
             $filterType  = INPUT_POST;
         }
@@ -91,7 +102,7 @@ class Request
 
         $json = file_get_contents('php://input');
         if ($json !== false) {
-            $body = array_merge($body, json_decode($json, true));
+            $body = array_merge($body, json_decode($json, true) ?? []);
         }
 
         return $body;

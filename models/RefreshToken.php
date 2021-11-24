@@ -7,15 +7,14 @@ namespace app\models;
 use app\core\Application;
 use app\core\db\DbModel;
 use app\core\exception\ExpiredException;
-use DateTime;
 
 
 class RefreshToken extends DbModel
 {
-    public int       $id     = 0;
-    public int       $user_id = 0;
-    public string    $token  = '';
-    public ?DateTime $expire = null;
+    public int    $id      = 0;
+    public int    $user_id = 0;
+    public string $token   = '';
+    public ?int   $expire  = null;
 
     public function tableName(): string
     {
@@ -29,7 +28,7 @@ class RefreshToken extends DbModel
 
     public function attributes(): array
     {
-        return ['id', 'user_id', 'token', 'expire'];
+        return ['user_id', 'token', 'expire'];
     }
 
     public function properties(): array
@@ -49,7 +48,7 @@ class RefreshToken extends DbModel
     {
         $refreshToken     = new RefreshToken();
         $refreshToken->id = $user_id;
-        $expire           = (new DateTime())->setTimestamp(time() + 2678400); // Adds 31 days to expire time
+        $expire           = time() + 2678400; // Adds 31 days to expire time
 
         $statement = Application::$app->db->prepare("DELETE FROM RefreshToken WHERE user_id = :user_id AND expire < NOW();");
         $statement->bindValue(':user_id', $user_id);
@@ -60,10 +59,10 @@ class RefreshToken extends DbModel
         $refreshToken->token = $token;
         $refreshToken->expire = $expire;
 
-        $statement = Application::$app->db->prepare("INSERT INTO RefreshToken (user_id, token, expire) VALUES (:user_id, :token, :expire);");
+        $statement = Application::$app->db->prepare("INSERT INTO RefreshToken (user_id, token, expire) VALUES (:user_id, :token, FROM_UNIXTIME(:expire));");
         $statement->bindValue(':user_id', $user_id);
         $statement->bindValue(':token', crypt($token, Application::$app->tokenSalt));
-        $statement->bindValue(':expire', $expire->format('Y-m-d H:i:s'));
+        $statement->bindValue(':expire', $expire);
         $statement->execute();
 
 
@@ -76,24 +75,19 @@ class RefreshToken extends DbModel
             return false;
         }
 
-        $statement = Application::$app->db->prepare("SELECT id, user_id, token, expire FROM RefreshToken WHERE token = :token AND user_id = :user_id ORDER BY expire DESC LIMIT 1;");
+        $statement = Application::$app->db->prepare("SELECT id, user_id, token, UNIX_TIMESTAMP(expire) FROM RefreshToken WHERE token = :token AND user_id = :user_id ORDER BY expire DESC LIMIT 1;");
         $statement->bindValue(':token', crypt($this->token, Application::$app->tokenSalt));
         $statement->bindValue(':user_id', $this->user_id);
         $statement->execute();
-        $result = $statement->fetch(\PDO::FETCH_OBJ);
 
-        if ($result === false) {
+        $refreshToken = $statement->fetchObject(RefreshToken::class);
+
+        if ($refreshToken === false) {
             $this->addError('token', "Invalid token");
             return false;
         }
 
-        $refreshToken = new RefreshToken();
-        $refreshToken->id      = intval($result->id);
-        $refreshToken->user_id = intval($result->user_id);
-        $refreshToken->token   = $result->token;
-        $refreshToken->expire  = new DateTime($result->expire);
-
-        if ($refreshToken->expire->getTimestamp() < time()) {
+        if ($refreshToken->expire < time()) {
             throw new ExpiredException;
         }
 
