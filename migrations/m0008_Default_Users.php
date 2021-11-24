@@ -22,7 +22,7 @@ class m0008_Default_Users
     public function down()
     {
         $db = Application::$app->db;
-        $SQL = "DROP TABLE Shifts;";
+        $SQL = "DELETE FROM Users WHERE username IN ('danny8632', 'admin', 'medarbejder1', 'medarbejder2');";
         $db->pdo->exec($SQL);
     }
 }
