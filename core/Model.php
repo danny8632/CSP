@@ -17,6 +17,9 @@ abstract class Model
     public const RULE_MAX      = 'max';
     public const RULE_MACTH    = 'macth';
     public const RULE_UNIQUE   = 'unique';
+    public const RULE_INT      = 'int';
+    public const RULE_FLOAT    = 'float';
+    public const RULE_BOOL     = 'bool';
 
     /**
      * The error array is going to contain all the errors that the
@@ -65,6 +68,16 @@ abstract class Model
      * @return array
      */
     abstract public function rules(): array;
+
+
+    /**
+     * This should return a list of all "public"/"selectable" properties in your class
+     * So fx the User class has "confirmPassword" we don't want that data to get to the frontend
+     * so this should not be returned.
+     *
+     * @return array
+     */
+    abstract public function properties(): array;
 
 
     /**
@@ -144,6 +157,30 @@ abstract class Model
                         $this->addErrorForRule($attribute, self::RULE_UNIQUE, ['field' => $this->getLabel($attribute)]);
                     }
                 }
+
+                if ($ruleName === self::RULE_INT) {
+                    $this->{$attribute} = filter_var($value, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+
+                    if (is_null($this->{$attribute})) {
+                        $this->addErrorForRule($attribute, self::RULE_INT);
+                    }
+                }
+
+                if ($ruleName === self::RULE_FLOAT) {
+                    $this->{$attribute} = filter_var($value, FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE);
+
+                    if (is_null($this->{$attribute})) {
+                        $this->addErrorForRule($attribute, self::RULE_FLOAT);
+                    }
+                }
+
+                if ($ruleName === self::RULE_BOOL) {
+                    $this->{$attribute} = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+
+                    if (is_null($this->{$attribute})) {
+                        $this->addErrorForRule($attribute, self::RULE_BOOL);
+                    }
+                }
             }
         }
 
@@ -199,6 +236,9 @@ abstract class Model
             self::RULE_MAX      => 'Max length of this field must be {max}',
             self::RULE_MACTH    => 'This field must be the same as {match}',
             self::RULE_UNIQUE   => 'Record with this {field} already exists',
+            self::RULE_INT      => 'This must be of type int',
+            self::RULE_FLOAT    => 'This must be of type float',
+            self::RULE_BOOL     => 'This must be of type boolean',
         ];
     }
 
@@ -235,6 +275,20 @@ abstract class Model
         foreach (get_object_vars($this) as $key => $value) {
             if ($this->hasError($key)) {
                 $response[$key] = $this->getFirstError($key);
+            }
+        }
+
+        return $response;
+    }
+
+
+    public function getData(): array
+    {
+        $response = [];
+
+        foreach ($this->properties() as $key) {
+            if (isset($this->{$key})) {
+                $response[$key] = $this->{$key};
             }
         }
 

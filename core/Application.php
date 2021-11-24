@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\core;
 
 use app\core\db\Database;
+use app\models\RefreshToken;
 use app\models\User;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
@@ -35,6 +36,13 @@ class Application
      * @var string
      */
     private string $authKey = '';
+
+    /**
+     * This is the salt for the refresh token. This is top secret and is set in .env
+     *
+     * @var string
+     */
+    public string $tokenSalt = '';
 
     /**
      * This is the chosen algorithms for encrypting the JWT
@@ -111,6 +119,7 @@ class Application
         //  Initilizing all class variables to be access later
         $this->userClass = $config['userClass'] ?? '';
         $this->authKey   = $config['auth_key'] ?? '';
+        $this->tokenSalt = $config['token_salt'] ?? '';
         self::$ROOT_DIR  = $rootPath;
         self::$app       = $this;
 
@@ -122,7 +131,7 @@ class Application
 
 
         //  Finds the actual user from the token
-        if($this->request->getAuthToken() !== false) {
+        if ($this->request->getAuthToken() !== false) {
             $this->auth($this->request->getAuthToken());
         }
     }
@@ -142,7 +151,7 @@ class Application
         try {
             echo $this->router->resolve();
         } catch (\Exception $e) {
-            $this->response->setStatusCode($e->getCode());
+            $this->response->setStatusCode(intval($e->getCode() !== null ? $e->getCode() : 404));
             echo $e->getMessage();
         }
     }
@@ -153,26 +162,52 @@ class Application
      * into the session so it can be fetched on later requests.
      *
      * @param UserModel $user
-     * @return string jwt token
+     * @return array contains jwt and refresh token
      */
-    public function login(UserModel $user): string
+    public function login(UserModel $user): array
+    {
+        $jwt = $this->generateJWT($user);
+        $this->user = $user;
+
+        $refreshToken = RefreshToken::new($user->id);
+
+        return [
+            'jwt'           => $jwt,
+            'refresh_token' => [
+                'token' => $refreshToken->token,
+                'exp'   => $refreshToken->expire->getTimestamp()
+            ]
+        ];
+    }
+
+
+    /**
+     * Generates the jwt token
+     *
+     * @param UserModel $user
+     * @return array [ 'token' => jwt token, 'exp' => 423589437 ]
+     */
+    public function generateJWT(UserModel $user): array
     {
         $iat = time();
-        $exp = $iat + 60;
+        $exp = $iat + 60 * 60;
 
-        $token = JWT::encode([
+        $token = JWT::encode(
+            [
                 "iss" => "http://localhost",
                 "aud" => "http://localhost",
                 "iat" => $iat,
                 "exp" => $exp,
-                'user' => $user
+                'user' => $user->getData()
             ],
             $this->authKey,
             self::ALGORITHM
         );
 
-        $this->user = $user;
-        return $token;
+        return [
+            'token' => $token,
+            'exp'   => $exp,
+        ];
     }
 
 
@@ -193,7 +228,6 @@ class Application
             $user->loadData(get_object_vars($token->user));
 
             $this->user = $user;
-
         } catch (\Exception $e) {
             $this->response->setStatusCode($e->getCode());
             echo $e->getMessage();

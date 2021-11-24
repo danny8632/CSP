@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace app\models;
 
 use app\core\Application;
@@ -8,40 +10,43 @@ use app\core\Model;
 
 class LoginForm extends Model
 {
-    public string $email    = '';
+    public string $username = '';
     public string $password = '';
 
 
     public function rules(): array
     {
         return [
-            'email'    => [self::RULE_REQUIRED, self::RULE_EMAIL],
+            'username' => [self::RULE_REQUIRED],
             'password' => [self::RULE_REQUIRED],
         ];
+    }
+
+    public function properties(): array
+    {
+        return ['username', 'password'];
     }
 
 
     public function labels(): array
     {
         return [
-            'email'    => 'Email',
+            'username' => 'Username',
             'password' => 'Password',
         ];
     }
 
 
-    public function login() : string|bool
+    public function login(): array|bool
     {
-        $user = User::findOne(['email' => $this->email]);
+        $user = User::findOne(['username' => $this->username]);
 
-        if(!$user)
-        {
-            $this->addError('email', 'User does not exist with this email');
+        if (!$user) {
+            $this->addError('username', 'User does not exist with this username');
             return false;
         }
 
-        if(!password_verify($this->password, $user->password))
-        {
+        if (!password_verify($this->password, $user->password)) {
             $this->addError('password', 'Login is incorrect');
             return false;
         }

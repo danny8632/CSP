@@ -29,7 +29,8 @@ $dotenv->load();
 
 
 $config = [
-    'userClass' => \app\models\User::class,
+    'userClass'  => \app\models\User::class,
+    'token_salt' => $_ENV['TOKEN_SALT'],
     'db' => [
         'dsn'      => $_ENV['DB_DSN'],
         'user'     => $_ENV['DB_USER'],
@@ -64,6 +65,6 @@ $app->router->get('/user', [AuthController::class, 'user']);
 
 $app->router->post('/login', [AuthController::class, 'login']);
 $app->router->post('/register', [AuthController::class, 'register']);
-$app->router->get('/user', [AuthController::class, 'user']);
+$app->router->post('/tokenRefresh', [AuthController::class, 'tokenRefresh']);
 
 $app->run();

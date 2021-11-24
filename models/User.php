@@ -1,27 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 namespace app\models;
 
 use app\core\UserModel;
 
 class User extends UserModel
 {
-    const STATUS_INACTIVE = 0;
-    const STATUS_ACTIVE = 1;
-    const STATUS_DELETED = 2;
+    const TYPE_EMPLOYEE = 'employee';
+    const TYPE_ADMIN    = 'admin';
 
-
-    public string $firstname = '';
-    public string $lastname = '';
-    public string $email = '';
-    public int $status = self::STATUS_INACTIVE;
-    public string $password = '';
+    public int    $id              = 0;
+    public string $username        = '';
+    public string $password        = '';
     public string $confirmPassword = '';
+    public string $firstname       = '';
+    public string $lastname        = '';
+    public string $type            = self::TYPE_EMPLOYEE;
+    public float  $requiredhours   = 0;
+    public bool   $monthlypay      = false;
 
 
     public function tableName(): string
     {
-        return 'users';
+        return 'Users';
     }
 
 
@@ -33,45 +36,54 @@ class User extends UserModel
 
     public function save()
     {
-        $this->status = self::STATUS_INACTIVE;
-
         $this->password = password_hash($this->password, PASSWORD_DEFAULT);
         return parent::save();
     }
 
 
-    public function rules() : array
+    public function rules(): array
     {
         return [
-            'firstname' => [self::RULE_REQUIRED],
-            'lastname' => [self::RULE_REQUIRED],
-            'email' => [self::RULE_REQUIRED, self::RULE_EMAIL, [
-                self::RULE_UNIQUE, 'class' => self::class
-            ]],
-            'password' => [self::RULE_REQUIRED, [self::RULE_MIN, 'min' => 8], [self::RULE_MAX, 'max' => 30]],
+            'username'        => [self::RULE_REQUIRED],
+            'password'        => [self::RULE_REQUIRED, [self::RULE_MIN, 'min' => 8], [self::RULE_MAX, 'max' => 30]],
             'confirmPassword' => [self::RULE_REQUIRED, [self::RULE_MACTH, 'match' => 'password']],
+            'firstname'       => [self::RULE_REQUIRED],
+            'lastname'        => [self::RULE_REQUIRED],
+            'type'            => [self::RULE_REQUIRED],
+            'requiredhours'   => [self::RULE_REQUIRED, self::RULE_FLOAT],
+            'monthlypay'      => [self::RULE_REQUIRED, self::RULE_BOOL],
+
         ];
     }
 
-    public function attributes() : array
+    public function attributes(): array
     {
-        return ['firstname', 'lastname', 'email', 'password', 'status'];
+        return ['username', 'password', 'firstname', 'lastname', 'type', 'requiredhours', 'monthlypay'];
+    }
+
+
+    public function properties(): array
+    {
+        return ['username', 'firstname', 'lastname', 'type', 'requiredhours', 'monthlypay'];
     }
 
 
     public function labels(): array
     {
         return [
-            'firstname' => 'First name',
-            'lastname' => 'Last name',
-            'email' => 'Email',
-            'password' => 'Password',
+            'firstname'       => 'First name',
+            'lastname'        => 'Last name',
+            'username'        => 'Username',
+            'password'        => 'Password',
+            'type'            => 'Type',
+            'requiredhours'   => 'Required hours',
+            'monthlypay'      => 'Monthly paid',
             'confirmPassword' => 'Confirm password',
         ];
     }
 
 
-    public function getDisplayName() : string
+    public function getDisplayName(): string
     {
         return $this->firstname . ' ' . $this->lastname;
     }
