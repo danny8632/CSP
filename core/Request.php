@@ -63,6 +63,17 @@ class Request
 
 
     /**
+     * Helper function to check if the method is a post
+     *
+     * @return bool true if the method is a post method
+     */
+    public function isPut(): bool
+    {
+        return $this->method() === 'put';
+    }
+
+
+    /**
      * Helper function to check if the method is a delete
      *
      * @return bool true if the method is a delete method
@@ -89,7 +100,7 @@ class Request
             $filterType  = INPUT_GET;
         }
 
-        if ($this->isPost() || $this->isDelete()) {
+        if ($this->isPost() || $this->isDelete() || $this->isPut()) {
             $requestKeys = array_keys($_POST);
             $filterType  = INPUT_POST;
         }

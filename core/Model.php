@@ -15,7 +15,7 @@ abstract class Model
     public const RULE_EMAIL    = 'email';
     public const RULE_MIN      = 'min';
     public const RULE_MAX      = 'max';
-    public const RULE_MACTH    = 'macth';
+    public const RULE_MATCH    = 'macth';
     public const RULE_UNIQUE   = 'unique';
     public const RULE_INT      = 'int';
     public const RULE_FLOAT    = 'float';
@@ -62,7 +62,7 @@ abstract class Model
      *      'lastname'        => [self::RULE_REQUIRED],
      *      'password'        => [self::RULE_REQUIRED, [self::RULE_MIN, 'min' => 8], [self::RULE_MAX, 'max' => 30]],
      *      'email'           => [self::RULE_REQUIRED, self::RULE_EMAIL, [ self::RULE_UNIQUE, 'class' => self::class ]],
-     *      'confirmPassword' => [self::RULE_REQUIRED, [self::RULE_MACTH, 'match' => 'password']],
+     *      'confirmPassword' => [self::RULE_REQUIRED, [self::RULE_MATCH, 'match' => 'password']],
      * ]
      *
      * @return array
@@ -107,7 +107,7 @@ abstract class Model
 
     /**
      * This is the validate function. This should have a validation for each rule
-     * Specified as static rules fx: RULE_REQUIRED or RULE_MACTH
+     * Specified as static rules fx: RULE_REQUIRED or RULE_MATCH
      *
      * @return bool returns true if theres no errors
      */
@@ -138,9 +138,9 @@ abstract class Model
                     $this->addErrorForRule($attribute, self::RULE_MAX, $rule);
                 }
 
-                if ($ruleName === self::RULE_MACTH && $value !== $this->{$rule['match']}) {
+                if ($ruleName === self::RULE_MATCH && $value !== $this->{$rule['match']}) {
                     $rule['match'] = $this->getLabel($rule['match']);
-                    $this->addErrorForRule($attribute, self::RULE_MACTH, $rule);
+                    $this->addErrorForRule($attribute, self::RULE_MATCH, $rule);
                 }
 
                 if ($ruleName === self::RULE_UNIQUE) {
@@ -234,7 +234,7 @@ abstract class Model
             self::RULE_EMAIL    => 'This field must be a valid email address',
             self::RULE_MIN      => 'Min length of this field must be {min}',
             self::RULE_MAX      => 'Max length of this field must be {max}',
-            self::RULE_MACTH    => 'This field must be the same as {match}',
+            self::RULE_MATCH    => 'This field must be the same as {match}',
             self::RULE_UNIQUE   => 'Record with this {field} already exists',
             self::RULE_INT      => 'This must be of type int',
             self::RULE_FLOAT    => 'This must be of type float',

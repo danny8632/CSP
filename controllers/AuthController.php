@@ -20,7 +20,7 @@ class AuthController extends Controller
         //$this->registerMiddleware(new AuthMiddleware(['user']));
     }
 
-    public function login(Request $request, Response $response)
+    public function login(Request $request)
     {
         if ($request->isPost() === false) return;
 

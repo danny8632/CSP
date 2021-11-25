@@ -17,7 +17,7 @@ class DepartmentController extends Controller
 {
     public function __construct()
     {
-        $this->registerMiddleware(new AuthMiddleware(['get', 'post', 'delete']));
+        $this->registerMiddleware(new AuthMiddleware(['get', 'post', 'put', 'delete']));
     }
 
 
@@ -88,9 +88,45 @@ class DepartmentController extends Controller
         return $department->formatErrors();
     }
 
+
+    public function put(Request $request)
+    {
+        if ($request->isPut() === false) {
+            throw new NotFoundException;
+        }
+
+        //  security
+        if (!Application::$app->user->isAdmin()) {
+            throw new ForbiddenException;
+        }
+
+        $data = $request->getBody();
+
+        if (!isset($data['id'])) {
+            throw new NotFoundException;
+        }
+
+        $department = Department::findOne(['id' => intval($data['id'])]);
+
+        if ($department === false) {
+            throw new NotFoundException;
+        }
+
+        $department->loadData($data);
+
+        if ($department->validate() && $department->update()) {
+            return $department->getData();
+        }
+
+        return $department->formatErrors();
+    }
+
+
     public function delete(Request $request)
     {
-        if ($request->isDelete() === false) return;
+        if ($request->isDelete() === false) {
+            throw new NotFoundException;
+        }
 
         //  security
         if (!Application::$app->user->isAdmin()) {
@@ -103,16 +139,16 @@ class DepartmentController extends Controller
             return "You must parse the id of the relation";
         }
 
-        $Department = Department::findOne(['id' => $data['id']]);
+        $department = Department::findOne(['id' => intval($data['id'])]);
 
-        if ($Department === false) {
+        if ($department === false) {
             throw new NotFoundException;
         }
 
-        if ($Department->delete()) {
+        if ($department->delete()) {
             return true;
         }
 
-        return $Department->formatErrors();
+        return $department->formatErrors();
     }
 }

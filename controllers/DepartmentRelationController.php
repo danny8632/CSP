@@ -23,7 +23,7 @@ class DepartmentRelationController extends Controller
     public function get(Request $request)
     {
         $data = $request->getBody();
-        $userId = $data['user_id'] ?? Application::$app->user->id;
+        $userId = intval($data['user_id'] ?? Application::$app->user->id);
 
         //  security
         if (!Application::$app->user->isAdmin() && $userId !== Application::$app->user->id) {
@@ -68,7 +68,7 @@ class DepartmentRelationController extends Controller
             return "You must parse the id of the relation";
         }
 
-        $departmentRelation = DepartmentRelation::findOne(['id' => $data['id']]);
+        $departmentRelation = DepartmentRelation::findOne(['id' => intval($data['id'])]);
 
         if ($departmentRelation === false) {
             throw new NotFoundException;

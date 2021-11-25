@@ -4,6 +4,7 @@ namespace app\core\db;
 
 use app\core\Model;
 use app\core\Application;
+use app\core\exception\NotFoundException;
 
 abstract class DbModel extends Model
 {
@@ -17,7 +18,6 @@ abstract class DbModel extends Model
     abstract public function tableName(): string;
     abstract public function attributes(): array;
     abstract public function primaryKey(): string;
-
 
     public function save()
     {
@@ -72,7 +72,7 @@ abstract class DbModel extends Model
     }
 
 
-    public static function findOne($where)
+    public static function findOne($where): DbModel
     {
         $tableName  = (new static)->tableName();
         $attributes = array_keys($where);
@@ -86,11 +86,18 @@ abstract class DbModel extends Model
         }
 
         $statement->execute();
-        return $statement->fetchObject(static::class);
+
+        $result = $statement->fetchObject(static::class);
+
+        if ($result === false) {
+            throw new NotFoundException;
+        }
+
+        return $result;
     }
 
 
-    public static function findAll(array $where = [])
+    public static function findAll(array $where = []): array
     {
         $tableName  = (new static)->tableName();
 
@@ -109,7 +116,7 @@ abstract class DbModel extends Model
             $instance = new static();
 
             foreach ($data as $key => $value) {
-                if(is_numeric($key)) continue;
+                if (is_numeric($key)) continue;
 
                 $type = isset($instance->{$key}) ? gettype($instance->{$key}) : null;
                 if (in_array($type, self::$parser)) {

@@ -83,6 +83,20 @@ class Router
 
 
     /**
+     * This function registers all the put routes. This can be done via:
+     * $router->put('/contact', [SiteController::class, 'contact']);
+     *
+     * @param string $path The path of the route
+     * @param mixed $callback A callback or an array
+     * @return void
+     */
+    public function put(string $path, $callback): void
+    {
+        $this->routes['put']["$path"] = $callback;
+    }
+
+
+    /**
      * This function registers all the delete routes. This can be done via:
      * $router->post('/contact', [SiteController::class, 'contact']);
      *

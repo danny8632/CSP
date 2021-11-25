@@ -46,7 +46,7 @@ class User extends UserModel
         return [
             'username'        => [self::RULE_REQUIRED],
             'password'        => [self::RULE_REQUIRED, [self::RULE_MIN, 'min' => 8], [self::RULE_MAX, 'max' => 30]],
-            'confirmPassword' => [self::RULE_REQUIRED, [self::RULE_MACTH, 'match' => 'password']],
+            'confirmPassword' => [self::RULE_REQUIRED, [self::RULE_MATCH, 'match' => 'password']],
             'firstname'       => [self::RULE_REQUIRED],
             'lastname'        => [self::RULE_REQUIRED],
             'type'            => [self::RULE_REQUIRED],

@@ -21,6 +21,7 @@ if($isApiCall === false) {
 use app\controllers\AuthController;
 use app\controllers\DepartmentController;
 use app\controllers\DepartmentRelationController;
+use app\controllers\UserController;
 use app\core\Application;
 
 require_once __DIR__.'/../vendor/autoload.php';
@@ -53,7 +54,13 @@ $app->router->delete('/departmentRelation', [DepartmentRelationController::class
 
 $app->router->get('/department', [DepartmentController::class, 'get']);
 $app->router->post('/department', [DepartmentController::class, 'post']);
+$app->router->put('/department', [DepartmentController::class, 'put']);
 $app->router->delete('/department', [DepartmentController::class, 'delete']);
 
+
+$app->router->get('/user', [UserController::class, 'get']);
+$app->router->post('/user', [UserController::class, 'post']);
+$app->router->post('/user', [UserController::class, 'put']);
+$app->router->delete('/user', [UserController::class, 'delete']);
 
 $app->run();
