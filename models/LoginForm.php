@@ -39,7 +39,13 @@ class LoginForm extends Model
 
     public function login(): array|bool
     {
-        $user = User::findOne(['username' => $this->username]);
+        try {
+            $user = User::findOne(['username' => $this->username]);
+        } catch (\Throwable $th) {
+            exit(json_encode([
+                'username' => 'User does not exist with this username'
+            ]));
+        }
 
         if (!$user) {
             $this->addError('username', 'User does not exist with this username');
