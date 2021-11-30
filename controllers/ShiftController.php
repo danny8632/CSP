@@ -16,7 +16,7 @@ class ShiftController extends Controller
 {
     public function __construct()
     {
-        $this->registerMiddleware(new AuthMiddleware(['get', 'post', 'delete']));
+        $this->registerMiddleware(new AuthMiddleware(['get', 'post', 'put', 'delete']));
     }
 
     public function get(Request $request)

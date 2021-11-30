@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace app\models;
 
-use app\core\Application;
 use app\core\db\DbModel;
 
 class Shift extends DbModel
@@ -29,8 +28,8 @@ class Shift extends DbModel
     public function rules(): array
     {
         return [
-            'user_id' => [self::RULE_REQUIRED] [self::RULE_INT],
-            'department_id' => [self::RULE_REQUIRED], [self::RULE_INT],
+            'user_id' => [self::RULE_REQUIRED, self::RULE_INT],
+            'department_id' => [self::RULE_REQUIRED, self::RULE_INT],
             'from' => [self::RULE_REQUIRED],
             'to' => [self::RULE_REQUIRED],
             'break_length' => [self::RULE_REQUIRED]
