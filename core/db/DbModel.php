@@ -125,7 +125,7 @@ abstract class DbModel extends Model
 
                 $instance->{$key} = $value;
             }
-            $response[] = $instance;
+            $response[] = $instance->getData();
         }
         return $response;
     }
