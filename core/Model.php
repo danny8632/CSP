@@ -304,7 +304,11 @@ abstract class Model
 
         foreach ($this->properties() as $key) {
             if (isset($this->{$key})) {
-                $response[$key] = $this->{$key};
+                $value = $this->{$key};
+                if(is_a($this->{$key}, DateTime::class)) {
+                    $value = $value->format(self::TIMESTAMP_FORMAT);
+                }
+                $response[$key] = $value;
             }
         }
 

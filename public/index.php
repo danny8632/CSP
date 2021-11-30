@@ -84,7 +84,7 @@ $app->router->delete('/department', [DepartmentController::class, 'delete']);
 
 $app->router->get('/user', [UserController::class, 'get']);
 $app->router->post('/user', [UserController::class, 'post']);
-$app->router->post('/user', [UserController::class, 'put']);
+$app->router->put('/user', [UserController::class, 'put']);
 $app->router->delete('/user', [UserController::class, 'delete']);
 
 $app->router->get('/shift', [ShiftController::class, 'get']);

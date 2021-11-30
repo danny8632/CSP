@@ -90,7 +90,7 @@ class ShiftController extends Controller
         $shift->loadData($request->getBody());
 
         if ($shift->validate() && $shift->save()) {
-            return $shift;
+            return $shift->getData();
         }
 
         return $shift->formatErrors();
