@@ -28,7 +28,7 @@ class UserController extends Controller
             $id = intval($data['id']);
 
             if ($user->isAdmin() || $id === $user->id) {
-                return User::findOne(['id', $id])->getData();
+                return User::findOne(['id' => $id])->getData();
             }
             throw new ForbiddenException;
         }

@@ -11,6 +11,7 @@ use app\core\exception\NotFoundException;
 use app\core\middlewares\AuthMiddleware;
 use app\core\Request;
 use app\models\Shift;
+use app\models\DepartmentRelation;
 
 class ShiftController extends Controller
 {
@@ -21,7 +22,58 @@ class ShiftController extends Controller
 
     public function get(Request $request)
     {
-        
+        if ($request->isGet() === false) {
+            throw new NotFoundException;
+        }
+
+        $data = $request->getBody();
+        $user = Application::$app->user;
+
+        if (isset($data['id'])) {
+            $id = intval($data['id']);
+            $shift = null;
+
+            if ($user->isAdmin()) {
+                $shift = Shift::findOne(['id' => $id])->getData();
+            } else {
+                $shift = Shift::findOne(['id' => $id, "user_id" => $user->id])->getData();
+            }
+
+            return $shift;
+        }
+
+        if (isset($data['user_id'])) {
+            $user_id = intval($data['user_id']);
+            
+            if (!$user->isAdmin() && $user_id !== $user->id) {
+                throw new ForbiddenException;
+            }
+
+            return Shift::findAll([['user_id', '=', $user_id]]);
+        }
+
+        if (isset($data['department_id'])) {
+            $department_id = intval($data['department_id']);
+
+            if (!$user->isAdmin()) {
+                $relations = DepartmentRelation::findAll([
+                    ['user_id', '=', $user->id],
+                    ['department_id', '=', $department_id]
+                ]);
+    
+                if (count($relations) === 0) {
+                    throw new ForbiddenException;
+                }
+            }
+
+            return Shift::findAll([['department_id', '=', $department_id]]);
+        }
+
+        if ($user->isAdmin() === false) {
+            throw new ForbiddenException;
+        }
+
+        return array_map(fn ($shift) => $shift->getData(), Shift::findAll([['1', '=', '1']]));
     }
 
     public function post(Request $request)

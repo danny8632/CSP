@@ -45,6 +45,7 @@ use app\controllers\AuthController;
 use app\controllers\DepartmentController;
 use app\controllers\DepartmentRelationController;
 use app\controllers\UserController;
+use app\controllers\ShiftController;
 use app\core\Application;
 
 require_once __DIR__.'/../vendor/autoload.php';
@@ -85,5 +86,8 @@ $app->router->get('/user', [UserController::class, 'get']);
 $app->router->post('/user', [UserController::class, 'post']);
 $app->router->post('/user', [UserController::class, 'put']);
 $app->router->delete('/user', [UserController::class, 'delete']);
+
+$app->router->get('/shift', [ShiftController::class, 'get']);
+$app->router->delete('/shift', [ShiftController::class, 'delete']);
 
 $app->run();
