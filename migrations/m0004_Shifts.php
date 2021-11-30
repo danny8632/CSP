@@ -14,7 +14,7 @@ class m0004_Shifts
             department_id INT NOT NULL,
             `from` TIMESTAMP NOT NULL DEFAULT '0000-00-00',
             `to` TIMESTAMP NOT NULL DEFAULT '0000-00-00',
-            breaklength INT NOT NULL,
+            break_length INT NOT NULL,
             created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
             modified TIMESTAMP on update CURRENT_TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (id),

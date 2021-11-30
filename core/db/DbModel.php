@@ -5,6 +5,7 @@ namespace app\core\db;
 use app\core\Model;
 use app\core\Application;
 use app\core\exception\NotFoundException;
+use DateTime;
 
 abstract class DbModel extends Model
 {
@@ -13,6 +14,13 @@ abstract class DbModel extends Model
         'integer' => FILTER_VALIDATE_INT,
         'double'  => FILTER_VALIDATE_FLOAT,
         'float'   => FILTER_VALIDATE_FLOAT
+    ];
+
+    private static array $insertParams = [
+        'boolean' => \PDO::PARAM_BOOL,
+        'integer' => \PDO::PARAM_INT,
+        'double'  => \PDO::PARAM_STR,
+        'float'   => \PDO::PARAM_STR
     ];
 
     abstract public function tableName(): string;
@@ -25,12 +33,26 @@ abstract class DbModel extends Model
         $attributes = $this->attributes();
 
         $params = implode(',', array_map(fn ($attr) => ":$attr", $attributes));
-        $attributesSql = implode(',', $attributes);
+        $attributesSql = implode('`,`', $attributes);
 
-        $statement = self::prepare("INSERT INTO $tableName ($attributesSql) VALUES ($params);");
+        $statement = self::prepare("INSERT INTO $tableName (`$attributesSql`) VALUES ($params);");
+
 
         foreach ($attributes as $attribute) {
-            $statement->bindValue(":$attribute", $this->{$attribute});
+            $value = $this->{$attribute};
+
+            $type      = isset($this->{$attribute}) ? gettype($this->{$attribute}) : null;
+            $paramType = \PDO::PARAM_STR;;
+            if (isset(self::$insertParams[$type])) {
+                $paramType = self::$insertParams[$type];
+            }
+
+
+            if(is_a($this->{$attribute}, DateTime::class)) {
+                $statement->bindValue(":$attribute", $value->format(self::TIMESTAMP_FORMAT), \PDO::PARAM_STR);
+            } else {
+                $statement->bindValue(":$attribute", $value, $paramType);
+            }
         }
 
         $statement->execute();
@@ -52,7 +74,14 @@ abstract class DbModel extends Model
         $statement = self::prepare("UPDATE $tableName SET $params WHERE $primaryKey = :primaryKey;");
 
         foreach ($this->attributes() as $attribute) {
-            $statement->bindValue(":$attribute", $this->{$attribute});
+            $value = $this->{$attribute};
+
+            if(is_a($this->{$attribute}, DateTime::class)) {
+                $value = $value->format(self::TIMESTAMP_FORMAT);
+            }
+
+
+            $statement->bindValue(":$attribute", $value);
         }
 
         $statement->execute();
@@ -77,7 +106,7 @@ abstract class DbModel extends Model
         $tableName  = (new static)->tableName();
         $attributes = array_keys($where);
 
-        $sqlWhere = implode("AND ", array_map(fn ($attr) => "$attr = :$attr", $attributes));
+        $sqlWhere = implode("AND ", array_map(fn ($attr) => "`$attr` = :$attr", $attributes));
 
         $statement = self::prepare("SELECT * FROM $tableName WHERE $sqlWhere LIMIT 1;");
 
@@ -87,13 +116,13 @@ abstract class DbModel extends Model
 
         $statement->execute();
 
-        $result = $statement->fetchObject(static::class);
+        $result = $statement->fetchAll();
 
         if ($result === false) {
             throw new NotFoundException;
         }
 
-        return $result;
+        return self::parseDbData($result, false)[0];
     }
 
 
@@ -111,6 +140,11 @@ abstract class DbModel extends Model
         $statement->execute();
         $records = $statement->fetchAll();
 
+        return self::parseDbData($records);
+    }
+
+
+    private static function parseDbData(array $records, bool $format = true) {
         $response = [];
         foreach ($records as $data) {
             $instance = new static();
@@ -123,9 +157,13 @@ abstract class DbModel extends Model
                     $value = filter_var($value, self::$parser[$type]);
                 }
 
+                if(isset($instance->{$key}) && is_a($instance->{$key}, DateTime::class)) {
+                    $value = DateTime::createFromFormat(self::TIMESTAMP_FORMAT, $value);
+                }
+
                 $instance->{$key} = $value;
             }
-            $response[] = $instance->getData();
+            $response[] = $format ? $instance->getData() : $instance;
         }
         return $response;
     }

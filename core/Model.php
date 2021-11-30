@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace app\core;
 
+use DateTime;
 
 /**
  * This is the base Model class
  */
 abstract class Model
 {
+    public const TIMESTAMP_FORMAT = 'Y-m-d H:i:s';
+
     //  Defining const for the validation
     public const RULE_REQUIRED = 'required';
     public const RULE_EMAIL    = 'email';
@@ -20,6 +23,7 @@ abstract class Model
     public const RULE_INT      = 'int';
     public const RULE_FLOAT    = 'float';
     public const RULE_BOOL     = 'bool';
+    public const RULE_DATETIME = 'datetime';
 
     /**
      * The error array is going to contain all the errors that the
@@ -42,10 +46,21 @@ abstract class Model
      */
     public function loadData(array $data): void
     {
+        $rules = $this->rules();
+
         //  Goes through each $data and checking if the property exists
         //  in the current model.
         foreach ($data as $key => $value) {
             if (property_exists($this, $key)) {
+
+                if(isset($rules[$key]) && in_array(self::RULE_DATETIME, $rules[$key])) {
+                    if(strlen($value) === 10) {
+                        $value = DateTime::createFromFormat('yyyy-mm-dd', $value);
+                    } else {
+                        $value = DateTime::createFromFormat(self::TIMESTAMP_FORMAT, $value);
+                    }
+                }
+
                 $this->{$key} = $value;
             }
         }
@@ -239,6 +254,7 @@ abstract class Model
             self::RULE_INT      => 'This must be of type int',
             self::RULE_FLOAT    => 'This must be of type float',
             self::RULE_BOOL     => 'This must be of type boolean',
+            self::RULE_DATETIME => 'This must be of type string looking like : 2021-01-01',
         ];
     }
 

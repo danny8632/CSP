@@ -7,14 +7,14 @@ namespace app\models;
 use app\core\Application;
 use app\core\db\DbModel;
 use app\core\exception\ExpiredException;
-
+use DateTime;
 
 class RefreshToken extends DbModel
 {
-    public int    $id      = 0;
-    public int    $user_id = 0;
-    public string $token   = '';
-    public ?int   $expire  = null;
+    public int       $id      = 0;
+    public int       $user_id = 0;
+    public string    $token   = '';
+    public ?DateTime $expire  = null;
 
     public function tableName(): string
     {
@@ -46,9 +46,9 @@ class RefreshToken extends DbModel
 
     public static function new(int $user_id): RefreshToken
     {
-        $refreshToken     = new RefreshToken();
-        $refreshToken->id = $user_id;
-        $expire           = time() + 2678400; // Adds 31 days to expire time
+        $refreshToken          = new RefreshToken();
+        $refreshToken->user_id = $user_id;
+        $expire                = date_timestamp_set(new DateTime(), time() + 2678400); // Adds 31 days to expire time
 
         $statement = Application::$app->db->prepare("DELETE FROM RefreshToken WHERE user_id = :user_id AND expire < NOW();");
         $statement->bindValue(':user_id', $user_id);
@@ -58,14 +58,8 @@ class RefreshToken extends DbModel
         $token = bin2hex(random_bytes(30));
         $refreshToken->token = $token;
         $refreshToken->expire = $expire;
-
-        $statement = Application::$app->db->prepare("INSERT INTO RefreshToken (user_id, token, expire) VALUES (:user_id, :token, FROM_UNIXTIME(:expire));");
-        $statement->bindValue(':user_id', $user_id);
-        $statement->bindValue(':token', crypt($token, Application::$app->tokenSalt));
-        $statement->bindValue(':expire', $expire);
-        $statement->execute();
-
-
+        
+        $refreshToken->save();
         return $refreshToken;
     }
 
