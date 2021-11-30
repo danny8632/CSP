@@ -78,12 +78,53 @@ class ShiftController extends Controller
 
     public function post(Request $request)
     {
+        if ($request->isPost() === false) {
+            throw new NotFoundException;
+        }
 
+        if (!Application::$app->user->isAdmin()) {
+            throw new ForbiddenException;
+        }
+
+        $shift = new Shift();
+        $shift->loadData($request->getBody());
+
+        if ($shift->validate() && $shift->save()) {
+            return $shift;
+        }
+
+        return $shift->formatErrors();
     }
 
     public function put(Request $request)
     {
+        if ($request->isPut() === false) {
+            throw new NotFoundException;
+        }
 
+        if (!Application::$app->user->isAdmin()) {
+            throw new ForbiddenException;
+        }
+
+        $data = $request->getBody();
+
+        if (!isset($data['id'])) {
+            throw new NotFoundException;
+        }
+
+        $shift = Shift::findOne(['id' => intval($data['id'])]);
+
+        if ($shift === false) {
+            throw new NotFoundException;
+        }
+
+        $shift->loadData($data);
+
+        if ($shift->validate() && $shift->update()) {
+            return $shift->getData();
+        }
+
+        return $shift->formatErrors();
     }
 
     public function delete(Request $request)

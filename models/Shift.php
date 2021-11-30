@@ -11,8 +11,8 @@ class Shift extends DbModel
     public int $id            = 0;
     public int $user_id       = 0;
     public int $department_id = 0;
-    public string $from       = '';
-    public string $to         = '';
+    public int $from          = 0;
+    public int $to            = 0;
     public int $break_length  = 0;
 
     public function tableName(): string
@@ -30,8 +30,8 @@ class Shift extends DbModel
         return [
             'user_id' => [self::RULE_REQUIRED, self::RULE_INT],
             'department_id' => [self::RULE_REQUIRED, self::RULE_INT],
-            'from' => [self::RULE_REQUIRED],
-            'to' => [self::RULE_REQUIRED],
+            'from' => [self::RULE_REQUIRED, self::RULE_INT],
+            'to' => [self::RULE_REQUIRED, self::RULE_INT],
             'break_length' => [self::RULE_REQUIRED]
         ];
     }
