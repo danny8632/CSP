@@ -48,7 +48,7 @@ abstract class DbModel extends Model
             }
 
 
-            if(is_a($this->{$attribute}, DateTime::class)) {
+            if (is_a($this->{$attribute}, DateTime::class)) {
                 $statement->bindValue(":$attribute", $value->format(self::TIMESTAMP_FORMAT), \PDO::PARAM_STR);
             } else {
                 $statement->bindValue(":$attribute", $value, $paramType);
@@ -60,23 +60,24 @@ abstract class DbModel extends Model
     }
 
 
-    public function update()
+    public function update(?array $data = null)
     {
         $tableName  = $this->tableName();
-        $attributes = $this->attributes();
+        $insertAttributes = $data !== null ? array_keys($data) : $this->attributes();
+        $attributes = $data !== null ? array_keys($data) : $this->attributes();
         $primaryKey = $this->primaryKey();
 
-        unset($attributes[$this->primaryKey()]);
+        unset($insertAttributes[$this->primaryKey()]);
 
-        $params = implode(',', array_map(fn ($attr) => "`$attr` = :$attr", $attributes));
+        $params = implode(',', array_map(fn ($attr) => "`$attr` = :$attr", $insertAttributes));
 
 
-        $statement = self::prepare("UPDATE $tableName SET $params WHERE $primaryKey = :primaryKey;");
+        $statement = self::prepare("UPDATE $tableName SET $params WHERE $primaryKey = :$primaryKey;");
 
-        foreach ($this->attributes() as $attribute) {
+        foreach ($attributes as $attribute) {
             $value = $this->{$attribute};
 
-            if(is_a($this->{$attribute}, DateTime::class)) {
+            if (is_a($this->{$attribute}, DateTime::class)) {
                 $value = $value->format(self::TIMESTAMP_FORMAT);
             }
 
@@ -144,7 +145,8 @@ abstract class DbModel extends Model
     }
 
 
-    private static function parseDbData(array $records, bool $format = true) {
+    private static function parseDbData(array $records, bool $format = true)
+    {
         $response = [];
         foreach ($records as $data) {
             $instance = new static();
@@ -157,7 +159,7 @@ abstract class DbModel extends Model
                     $value = filter_var($value, self::$parser[$type]);
                 }
 
-                if(isset($instance->{$key}) && is_a($instance->{$key}, DateTime::class)) {
+                if (isset($instance->{$key}) && is_a($instance->{$key}, DateTime::class)) {
                     $value = DateTime::createFromFormat(self::TIMESTAMP_FORMAT, $value);
                 }
 

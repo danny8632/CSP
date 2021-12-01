@@ -53,8 +53,8 @@ abstract class Model
         foreach ($data as $key => $value) {
             if (property_exists($this, $key)) {
 
-                if(isset($rules[$key]) && in_array(self::RULE_DATETIME, $rules[$key])) {
-                    if(strlen($value) === 10) {
+                if (isset($rules[$key]) && in_array(self::RULE_DATETIME, $rules[$key])) {
+                    if (strlen($value) === 10) {
                         $value = DateTime::createFromFormat('yyyy-mm-dd', $value);
                     } else {
                         $value = DateTime::createFromFormat(self::TIMESTAMP_FORMAT, $value);
@@ -126,10 +126,21 @@ abstract class Model
      *
      * @return bool returns true if theres no errors
      */
-    public function validate(): bool
+    public function validate(?array $data = null): bool
     {
-        foreach ($this->rules() as $attribute => $rules) {
-            $value = $this->{$attribute};
+        $classRules = $this->rules();
+
+        if ($data !== null) {
+            $dataAttributes = array_keys($data);
+            foreach ($classRules as $ruleKey => $ruleValue) {
+                if (!in_array($ruleKey, $dataAttributes)) {
+                    unset($classRules[$ruleKey]);
+                }
+            }
+        }
+
+        foreach ($classRules as $attribute => $rules) {
+            $value = $data !== null ? $data[$attribute] : $this->{$attribute};
             foreach ($rules as $rule) {
                 $ruleName = $rule;
 
@@ -305,7 +316,7 @@ abstract class Model
         foreach ($this->properties() as $key) {
             if (isset($this->{$key})) {
                 $value = $this->{$key};
-                if(is_a($this->{$key}, DateTime::class)) {
+                if (is_a($this->{$key}, DateTime::class)) {
                     $value = $value->format(self::TIMESTAMP_FORMAT);
                 }
                 $response[$key] = $value;

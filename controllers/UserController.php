@@ -81,7 +81,7 @@ class UserController extends Controller
 
         $user->loadData($data);
 
-        if ($user->validate() && $user->update()) {
+        if ($user->validate($data) && $user->update($data)) {
             return $user->getData();
         }
 
