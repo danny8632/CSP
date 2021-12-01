@@ -44,7 +44,7 @@ class User extends UserModel
         if(isset($data['password'])) {
             $this->password = password_hash($this->password, PASSWORD_DEFAULT);
         }
-        return parent::update();
+        return parent::update($data);
     }
 
 
@@ -52,7 +52,7 @@ class User extends UserModel
     public function rules(): array
     {
         return [
-            'username'        => [self::RULE_REQUIRED],
+            'username'        => [self::RULE_REQUIRED, [self::RULE_UNIQUE, 'class' => User::class]],
             'password'        => [self::RULE_REQUIRED, [self::RULE_MIN, 'min' => 8], [self::RULE_MAX, 'max' => 30]],
             'firstname'       => [self::RULE_REQUIRED],
             'lastname'        => [self::RULE_REQUIRED],

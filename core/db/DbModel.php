@@ -80,6 +80,9 @@ abstract class DbModel extends Model
                 $value = $value->format(self::TIMESTAMP_FORMAT);
             }
 
+            if(is_bool($this->{$attribute})) {
+                $value = intval($value);
+            }
 
             $statement->bindValue(":$attribute", $value);
         }
