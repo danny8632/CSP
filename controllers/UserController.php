@@ -37,7 +37,7 @@ class UserController extends Controller
             throw new ForbiddenException;
         }
 
-        return array_map(fn ($user) => $user->getData(), User::findAll([['1', '=', '1']]));
+        return User::findAll([['1', '=', '1']]);
     }
 
     public function post(Request $request)

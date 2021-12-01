@@ -14,7 +14,6 @@ class User extends UserModel
     public int    $id              = -1;
     public string $username        = '';
     public string $password        = '';
-    public string $confirmPassword = '';
     public string $firstname       = '';
     public string $lastname        = '';
     public string $type            = self::TYPE_EMPLOYEE;
@@ -40,13 +39,21 @@ class User extends UserModel
         return parent::save();
     }
 
+    public function update(?array $data = null)
+    {
+        if(isset($data['password'])) {
+            $this->password = password_hash($this->password, PASSWORD_DEFAULT);
+        }
+        return parent::update();
+    }
+
+
 
     public function rules(): array
     {
         return [
             'username'        => [self::RULE_REQUIRED],
             'password'        => [self::RULE_REQUIRED, [self::RULE_MIN, 'min' => 8], [self::RULE_MAX, 'max' => 30]],
-            'confirmPassword' => [self::RULE_REQUIRED, [self::RULE_MATCH, 'match' => 'password']],
             'firstname'       => [self::RULE_REQUIRED],
             'lastname'        => [self::RULE_REQUIRED],
             'type'            => [self::RULE_REQUIRED],
@@ -78,7 +85,6 @@ class User extends UserModel
             'type'            => 'Type',
             'requiredhours'   => 'Required hours',
             'monthlypay'      => 'Monthly paid',
-            'confirmPassword' => 'Confirm password',
         ];
     }
 
