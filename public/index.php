@@ -46,6 +46,7 @@ use app\controllers\DepartmentController;
 use app\controllers\DepartmentRelationController;
 use app\controllers\UserController;
 use app\controllers\ShiftController;
+use app\controllers\TimestampController;
 use app\core\Application;
 
 require_once __DIR__.'/../vendor/autoload.php';
@@ -59,7 +60,7 @@ $config = [
     'token_salt' => $_ENV['TOKEN_SALT'],
     'db' => [
         'dsn'      => $_ENV['DB_DSN'],
-        'user'     => $_ENV['DB_USER'],
+        'user'     => $_ENV['DB_USRNAME'],
         'password' => $_ENV['DB_PASSWORD'],
     ],
     'auth_key' => $_ENV['AUTH_KEY']
@@ -91,5 +92,7 @@ $app->router->get('/shift', [ShiftController::class, 'get']);
 $app->router->post('/shift', [ShiftController::class, 'post']);
 $app->router->put('/shift', [ShiftController::class, 'put']);
 $app->router->delete('/shift', [ShiftController::class, 'delete']);
+
+$app->router->post('/timestamp', [TimestampController::class, 'post']);
 
 $app->run();
