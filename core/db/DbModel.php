@@ -147,8 +147,10 @@ abstract class DbModel extends Model
     private static function parseDbData(array $records, bool $format = true)
     {
         $response = [];
+
         foreach ($records as $data) {
             $instance = new static();
+            $rules = $instance->rules();
 
             foreach ($data as $key => $value) {
                 if (is_numeric($key)) continue;
@@ -157,8 +159,8 @@ abstract class DbModel extends Model
                 if (in_array($type, self::$parser)) {
                     $value = filter_var($value, self::$parser[$type]);
                 }
-
-                if (isset($instance->{$key}) && is_a($instance->{$key}, DateTime::class)) {
+                
+                if (isset($rules[$key]) && in_array(self::RULE_DATETIME, $rules[$key])) {
                     $value = DateTime::createFromFormat(self::TIMESTAMP_FORMAT, $value);
                 }
 
@@ -166,6 +168,7 @@ abstract class DbModel extends Model
             }
             $response[] = $format ? $instance->getData() : $instance;
         }
+
         return $response;
     }
 

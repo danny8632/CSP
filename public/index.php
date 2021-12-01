@@ -93,6 +93,7 @@ $app->router->post('/shift', [ShiftController::class, 'post']);
 $app->router->put('/shift', [ShiftController::class, 'put']);
 $app->router->delete('/shift', [ShiftController::class, 'delete']);
 
+$app->router->get('/timestamp', [TimestampController::class, 'get']);
 $app->router->post('/timestamp', [TimestampController::class, 'post']);
 
 $app->run();

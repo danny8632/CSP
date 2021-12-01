@@ -11,6 +11,7 @@ use app\core\exception\NotFoundException;
 use app\core\middlewares\AuthMiddleware;
 use app\core\Request;
 use app\models\Timestamp;
+use app\models\Shift;
 
 class TimestampController extends Controller
 {
@@ -25,7 +26,14 @@ class TimestampController extends Controller
             throw new NotFoundException;
         }
 
+        $data = $request->getBody();
+        $user = Application::$app->user;
         
+        if (isset($data['user_id'])) {
+            $user_id = intval($data['user_id']);
+            $shifts = Shift::findAll([['user_id', '=', $user_id]]);
+            return $shifts;
+        }
     }
 
     public function post(Request $request)
