@@ -11,7 +11,7 @@ $dotenv->load();
 $config = [
     'db' => [
         'dsn' => $_ENV['DB_DSN'],
-        'user' => $_ENV['DB_USER'],
+        'user' => $_ENV['DB_USRNAME'],
         'password' => $_ENV['DB_PASSWORD'],
     ]
 ];

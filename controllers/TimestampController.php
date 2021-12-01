@@ -37,7 +37,7 @@ class TimestampController extends Controller
         $timestamp = new Timestamp();
         $timestamp->loadData($request->getBody());
 
-        if ($timestamp->validate() && $timestamp->save()) {
+        if ($timestamp->validate($request->getBody()) && $timestamp->save()) {
             return $timestamp->getData();
         }
 

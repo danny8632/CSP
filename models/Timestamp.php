@@ -11,8 +11,8 @@ class Timestamp extends DbModel
 {
     public int $id            = 0;
     public int $shift_id      = 0;
-    public ?DateTime $from;
-    public ?DateTime $to;
+    public ?DateTime $from    = null;
+    public ?DateTime $to      = null;
 
 
     public function tableName(): string
@@ -29,8 +29,8 @@ class Timestamp extends DbModel
     {
         return [
             'shift_id' => [self::RULE_REQUIRED, self::RULE_INT],
-            'from' => [self::RULE_DATETIME],
-            'to' => [self::RULE_DATETIME]
+            'from'     => [self::RULE_DATETIME],
+            'to'       => [self::RULE_DATETIME]
         ];
     }
 

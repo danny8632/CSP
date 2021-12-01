@@ -55,8 +55,7 @@ abstract class DbModel extends Model
             }
         }
 
-        $statement->execute();
-        return true;
+        return $statement->execute();
     }
 
 

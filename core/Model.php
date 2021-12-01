@@ -55,7 +55,7 @@ abstract class Model
 
                 if (isset($rules[$key]) && in_array(self::RULE_DATETIME, $rules[$key])) {
                     if (strlen($value) === 10) {
-                        $value = DateTime::createFromFormat('yyyy-mm-dd', $value);
+                        $value = DateTime::createFromFormat('Y-m-d', $value);
                     } else {
                         $value = DateTime::createFromFormat(self::TIMESTAMP_FORMAT, $value);
                     }
@@ -129,7 +129,7 @@ abstract class Model
     public function validate(?array $data = null): bool
     {
         $classRules = $this->rules();
-
+        
         if ($data !== null) {
             $dataAttributes = array_keys($data);
             foreach ($classRules as $ruleKey => $ruleValue) {
@@ -138,7 +138,7 @@ abstract class Model
                 }
             }
         }
-
+        
         foreach ($classRules as $attribute => $rules) {
             $value = $data !== null ? $data[$attribute] : $this->{$attribute};
             foreach ($rules as $rule) {
