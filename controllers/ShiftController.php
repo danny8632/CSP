@@ -73,7 +73,7 @@ class ShiftController extends Controller
             throw new ForbiddenException;
         }
 
-        return array_map(fn ($shift) => $shift->getData(), Shift::findAll([['1', '=', '1']]));
+        return Shift::findAll([['1', '=', '1']]);
     }
 
     public function post(Request $request)

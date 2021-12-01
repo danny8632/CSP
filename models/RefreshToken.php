@@ -63,7 +63,7 @@ class RefreshToken extends DbModel
         return $refreshToken;
     }
 
-    public function validate(): bool
+    public function validate(?array $data = null): bool
     {
         if (parent::validate() === false) {
             return false;
