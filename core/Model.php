@@ -148,7 +148,7 @@ abstract class Model
                     $ruleName = $rule[0];
                 }
 
-                if ($ruleName === self::RULE_REQUIRED && !$value) {
+                if ($ruleName === self::RULE_REQUIRED && !isset($value)) {
                     $this->addErrorForRule($attribute, self::RULE_REQUIRED);
                 }
 
@@ -174,7 +174,13 @@ abstract class Model
                     $uniqueAttr = $rule['attribute'] ?? $attribute;
                     $tableName  = $className::tableName();
 
-                    $statement = Application::$app->db->prepare("SELECT * FROM $tableName WHERE $uniqueAttr = :attr");
+                    $query = "SELECT * FROM $tableName WHERE $uniqueAttr = :attr";
+
+                    if(isset($this->id) && $this->id > 0) {
+                        $query = "SELECT * FROM $tableName WHERE $uniqueAttr = :attr AND id != {$this->id}";
+                    }
+
+                    $statement = Application::$app->db->prepare($query);
                     $statement->bindValue(":attr", $value);
                     $statement->execute();
                     $record = $statement->fetchObject();
