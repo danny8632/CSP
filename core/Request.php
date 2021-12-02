@@ -95,12 +95,12 @@ class Request
         $requestKeys = [];
         $filterType  = -10;
 
-        if ($this->isGet()) {
+        if ($this->isGet() || $this->isDelete()) {
             $requestKeys = array_keys($_GET);
             $filterType  = INPUT_GET;
         }
 
-        if ($this->isPost() || $this->isDelete() || $this->isPut()) {
+        if ($this->isPost() || $this->isPut()) {
             $requestKeys = array_keys($_POST);
             $filterType  = INPUT_POST;
         }
