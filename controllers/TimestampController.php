@@ -30,8 +30,10 @@ class TimestampController extends Controller
         $user = Application::$app->user;
 
         if (isset($data['shift_id'])) {
+            $shift_id = $data['shift_id'];
+
             //if ($user->isAdmin() === false) {
-                $shift_id = $data['shift_id'];
+                
                 //$shifts = Shift::findAll([['user_id', '=', $user->id]]);
                 $timestamps = Timestamp::findAll([['shift_id', '=', $shift_id]]);
                 //$shifts["timestamps"] = $timestamps;
@@ -47,13 +49,28 @@ class TimestampController extends Controller
             throw new NotFoundException;
         }
 
+        $data = $request->getBody();
+
+        if (!isset($data['shift_id'])) {
+            return "You must specify shift_id";
+        }
+
+        if (!isset($data['from'])) {
+            return "You must specify 'from' timestamp";
+        }
+
+        $shift_id = intval($data['shift_id']);
         $timestamp = new Timestamp();
-        $timestamp->loadData($request->getBody());
+        $timestamp->loadData($data);
+
+        if (Shift::findOne(['id' => $shift_id])->user_id !== Application::$app->user->id) {
+            throw new ForbiddenException;
+        }
 
         if ($timestamp->validate($request->getBody()) && $timestamp->save()) {
             return $timestamp->getData();
         }
-
+        
         return $timestamp->formatErrors();
     }
 
@@ -62,24 +79,34 @@ class TimestampController extends Controller
         if ($request->isPut() === false) {
             throw new NotFoundException;
         }
-
-        if (!Application::$app->user->isAdmin()) {
-            throw new ForbiddenException;
-        }
         
         $data = $request->getBody();
-        $timestamp = Timestamp::findOne(['shift_id' => intval($data('shift_id'))]);
 
-        if ($timestamp === false) {
-            throw new NotFoundException;
+        if (!isset($data['shift_id'])) {
+            return "You must specify shift_id";
+        }
+
+        if (!isset($data['to'])) {
+            return "You must specify 'to' timestamp";
+        }
+
+        $shift_id = intval($data['shift_id']);
+        $timestamp = Timestamp::findOne(['shift_id' => $shift_id]);
+
+        if (Application::$app->user->isAdmin() === false) {
+            if (Shift::findOne(['id' => $shift_id])->user_id !== Application::$app->user->id) {
+                throw new ForbiddenException;
+            }
         }
 
         $timestamp->loadData($data);
 
-        if ($timestamp->validate() && $timestamp->save()) {
-            return $timestamp->getData();
+        if ($timestamp->validate()) {
+            if ($timestamp->update(['id' => $timestamp->id, 'to' => $data['to']])) {
+                return $timestamp->getData();
+            }
         }
-
+    
         return $timestamp->formatErrors();
     }
 

@@ -65,11 +65,10 @@ abstract class DbModel extends Model
         $insertAttributes = $data !== null ? array_keys($data) : $this->attributes();
         $attributes = $data !== null ? array_keys($data) : $this->attributes();
         $primaryKey = $this->primaryKey();
-
+        
         unset($insertAttributes[$this->primaryKey()]);
 
         $params = implode(',', array_map(fn ($attr) => "`$attr` = :$attr", $insertAttributes));
-
 
         $statement = self::prepare("UPDATE $tableName SET $params WHERE $primaryKey = :$primaryKey;");
 
@@ -110,7 +109,7 @@ abstract class DbModel extends Model
         $attributes = array_keys($where);
 
         $sqlWhere = implode("AND ", array_map(fn ($attr) => "`$attr` = :$attr", $attributes));
-
+        
         $statement = self::prepare("SELECT * FROM $tableName WHERE $sqlWhere LIMIT 1;");
 
         foreach ($where as $key => $item) {
@@ -120,8 +119,8 @@ abstract class DbModel extends Model
         $statement->execute();
 
         $result = $statement->fetchAll();
-
-        if ($result === false) {
+        
+        if ($result === false || count($result) === 0) {
             throw new NotFoundException;
         }
 
