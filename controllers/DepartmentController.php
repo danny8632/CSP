@@ -114,7 +114,7 @@ class DepartmentController extends Controller
 
         $department->loadData($data);
 
-        if ($department->validate() && $department->update()) {
+        if ($department->validate($data) && $department->update($data)) {
             return $department->getData();
         }
 
