@@ -165,6 +165,7 @@ abstract class DbModel extends Model
                 
                 if (isset($rules[$key]) && in_array(self::RULE_DATETIME, $rules[$key])) {
                     $value = DateTime::createFromFormat(self::TIMESTAMP_FORMAT, $value);
+                    if ($value === false) $value = null;
                 }
 
                 $instance->{$key} = $value;

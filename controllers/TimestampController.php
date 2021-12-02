@@ -28,11 +28,16 @@ class TimestampController extends Controller
 
         $data = $request->getBody();
         $user = Application::$app->user;
-        
-        if (isset($data['user_id'])) {
-            $user_id = intval($data['user_id']);
-            $shifts = Shift::findAll([['user_id', '=', $user_id]]);
-            return $shifts;
+
+        if (isset($data['shift_id'])) {
+            //if ($user->isAdmin() === false) {
+                $shift_id = $data['shift_id'];
+                //$shifts = Shift::findAll([['user_id', '=', $user->id]]);
+                $timestamps = Timestamp::findAll([['shift_id', '=', $shift_id]]);
+                //$shifts["timestamps"] = $timestamps;
+                
+                return $timestamps;
+            //}
         }
     }
 
