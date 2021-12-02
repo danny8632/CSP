@@ -148,7 +148,7 @@ abstract class Model
                     $ruleName = $rule[0];
                 }
 
-                if ($ruleName === self::RULE_REQUIRED && !isset($value)) {
+                if ($ruleName === self::RULE_REQUIRED && (!isset($value) || strval($value) === '')) {
                     $this->addErrorForRule($attribute, self::RULE_REQUIRED);
                 }
 
