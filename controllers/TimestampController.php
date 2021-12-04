@@ -17,7 +17,7 @@ class TimestampController extends Controller
 {
     public function __construct()
     {
-        $this->registerMiddleware(new AuthMiddleware(['get', 'post', 'put', 'delete']));
+        $this->registerMiddleware(new AuthMiddleware(['get', 'post', 'put']));
     }
 
     public function get(Request $request)
@@ -27,20 +27,12 @@ class TimestampController extends Controller
         }
 
         $data = $request->getBody();
-        $user = Application::$app->user;
-
-        if (isset($data['shift_id'])) {
-            $shift_id = $data['shift_id'];
-
-            //if ($user->isAdmin() === false) {
-                
-                //$shifts = Shift::findAll([['user_id', '=', $user->id]]);
-                $timestamps = Timestamp::findAll([['shift_id', '=', $shift_id]]);
-                //$shifts["timestamps"] = $timestamps;
-                
-                return $timestamps;
-            //}
+        
+        if (!isset($data['shift_id'])) {
+            return "You must specify shift_id";
         }
+
+        return Timestamp::findAll([['shift_id', '=', $data['shift_id']]]);
     }
 
     public function post(Request $request)
@@ -108,34 +100,5 @@ class TimestampController extends Controller
         }
     
         return $timestamp->formatErrors();
-    }
-
-    public function delete(Request $request)
-    {
-        if ($request->isDelete() === false) {
-            throw new NotFoundException;
-        }
-
-        if (!Application::$user->isAdmin()) {
-            throw new ForbiddenException;
-        }
-
-        $data = $request->getBody();
-
-        if (!isset($data['shift_id'])) {
-            return "You must specify the id of the shift.";
-        }
-
-        $timestamp = Timestamp::findOne(['shift_id' => intval($data['shift_id'])]);
-
-        if ($timestamp === false) {
-            throw new NotFoundException;
-        }
-
-        if ($timestamp->delete()) {
-            return true;
-        }
-
-        $timestamp->formatErrors();
     }
 }
