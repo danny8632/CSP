@@ -148,8 +148,16 @@ abstract class Model
                     $ruleName = $rule[0];
                 }
 
-                if ($ruleName === self::RULE_REQUIRED && (!isset($value) || strval($value) === '')) {
-                    $this->addErrorForRule($attribute, self::RULE_REQUIRED);
+                if ($ruleName === self::RULE_REQUIRED) {
+                    $_value = $value;
+
+                    if(isset($_value) && is_a($value, DateTime::class)) {
+                        $_value = $value->getTimestamp();
+                    }
+
+                    if(!isset($_value) || strval($_value) === '') {
+                        $this->addErrorForRule($attribute, self::RULE_REQUIRED);
+                    }
                 }
 
                 if ($ruleName === self::RULE_EMAIL && !filter_var($value, FILTER_VALIDATE_EMAIL)) {
