@@ -143,7 +143,7 @@ class Request
     public function getAuthToken(): string|bool
     {
         $headers = $this->getHeaders();
-        $token   = str_replace('Bearer ', '', $headers['Authorization'] ?? '');
+        $token   = str_replace('Bearer ', '', $headers['Authorization'] ?? $headers['authorization'] ?? '');
 
         if (strlen($token) === 0) {
             return false;
