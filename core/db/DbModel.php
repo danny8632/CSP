@@ -55,7 +55,11 @@ abstract class DbModel extends Model
             }
         }
 
-        return $statement->execute();
+        $result = $statement->execute();
+
+        $this->id = intval(Application::$app->db->pdo->lastInsertId());
+
+        return $result;
     }
 
 

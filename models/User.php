@@ -19,6 +19,7 @@ class User extends UserModel
     public string $type            = self::TYPE_EMPLOYEE;
     public float  $requiredhours   = 0;
     public bool   $monthlypay      = false;
+    public array  $departments     = [];
 
 
     public function tableName(): string
@@ -30,6 +31,16 @@ class User extends UserModel
     public function primaryKey(): string
     {
         return 'id';
+    }
+
+
+    public function getData(): array
+    {
+        $departmentRelation = DepartmentRelation::findAll([['user_id', '=', $this->id]]);
+
+        $this->departments = array_map(fn($dep) => $dep['department_id'], $departmentRelation);
+
+        return parent::getData();
     }
 
 
@@ -71,7 +82,7 @@ class User extends UserModel
 
     public function properties(): array
     {
-        return ['id', 'username', 'firstname', 'lastname', 'type', 'requiredhours', 'monthlypay'];
+        return ['id', 'username', 'firstname', 'lastname', 'type', 'requiredhours', 'monthlypay', 'departments'];
     }
 
 
