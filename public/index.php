@@ -33,10 +33,7 @@ $serverRequestPath = $_SERVER['REQUEST_URI'] ?? '/';
 $isApiCall = strpos($serverRequestPath, 'api');
 
 if($isApiCall === false) {
-    ob_start();
-    include_once "./index.html";
-    echo ob_get_clean();
-    return;
+    return json_encode(["Error" => "Try using /api"]);
 }
 
 
