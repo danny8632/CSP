@@ -79,7 +79,10 @@ class ShiftTradeController extends Controller
         $shift = Shift::findOne(['id' => $ShiftTrade->shift_id]);
         $departmentId = $shift->department_id;
 
-        $newUser = DepartmentRelation::findAll([['user_id', '=', $ShiftTrade->newowner], ['department_id', '=', $departmentId]]);
+        $newUser = DepartmentRelation::findAll([
+            ['user_id', '=', $ShiftTrade->newowner],
+            ['department_id', '=', $departmentId]
+        ]);
 
         if (count($newUser) === 0) {
             $ShiftTrade->addError('newowner', "The new owner is not part of the department the shift is in");
@@ -98,13 +101,19 @@ class ShiftTradeController extends Controller
 
         $data = $request->getBody();
         $user = Application::$app->user;
+        $ShiftTrade = null;
 
-        if (!isset($data['id'])) {
-            return "You must specify id of the trade";
+        if (isset($data['id'])) {
+            $ShiftTrade = ShiftTrade::findOne(['id' => intval($data['id'])]);
         }
 
-        $ShiftTrade = ShiftTrade::findOne(['id' => intval($data['id'])]);
+        if (isset($data['shift_id']) && $ShiftTrade === null) {
+            $ShiftTrade = ShiftTrade::findOne(['shift_id' => intval($data['shift_id'])]);
+        }
 
+        if ($ShiftTrade === null) {
+            return "You must specify id or shift_id of the trade";
+        }
 
         if (!$user->isAdmin() || $ShiftTrade->currentowner !== $user->id) {
             throw new ForbiddenException;
@@ -117,11 +126,20 @@ class ShiftTradeController extends Controller
     {
         $data = $request->getBody();
 
-        if (!isset($data['id'])) {
-            return ['Error' => "You must pass an id of the trade"];
+        $ShiftTrade = null;
+
+        if (isset($data['id'])) {
+            $ShiftTrade = ShiftTrade::findOne(['id' => intval($data['id'])]);
         }
 
-        $ShiftTrade = ShiftTrade::findOne(['id' => intval($data['id'])]);
+        if (isset($data['shift_id']) && $ShiftTrade === null) {
+            $ShiftTrade = ShiftTrade::findOne(['shift_id' => intval($data['shift_id'])]);
+        }
+
+        if ($ShiftTrade === null) {
+            return "You must specify id or shift_id of the trade";
+        }
+
 
         if ($ShiftTrade->newowner !== Application::$app->user->id) {
             return ['Error' => "You can only accept your own pending shift trade"];
@@ -129,9 +147,11 @@ class ShiftTradeController extends Controller
 
         $shift = Shift::findOne(['id' => $ShiftTrade->shift_id]);
 
-        $newData = ['user_id' => Application::$app->user->id];
+        $newData = ['id' => $ShiftTrade->shift_id, 'user_id' => Application::$app->user->id];
 
         if ($shift->validate($newData) && $shift->update($newData)) {
+            $ShiftTrade->delete();
+
             return $shift->getData();
         }
 
@@ -141,12 +161,20 @@ class ShiftTradeController extends Controller
     public function declineTrade(Request $request)
     {
         $data = $request->getBody();
+        $ShiftTrade = null;
 
-        if (!isset($data['id'])) {
-            return ['Error' => "You must pass an id of the trade"];
+        if (isset($data['id'])) {
+            $ShiftTrade = ShiftTrade::findOne(['id' => intval($data['id'])]);
         }
 
-        $ShiftTrade = ShiftTrade::findOne(['id' => intval($data['id'])]);
+        if (isset($data['shift_id']) && $ShiftTrade === null) {
+            $ShiftTrade = ShiftTrade::findOne(['shift_id' => intval($data['shift_id'])]);
+        }
+
+        if ($ShiftTrade === null) {
+            return "You must specify id or shift_id of the trade";
+        }
+
 
         if ($ShiftTrade->newowner !== Application::$app->user->id) {
             return ['Error' => "You can only decline your own pending shift trade"];
@@ -159,20 +187,20 @@ class ShiftTradeController extends Controller
     {
         $data = $request->getBody();
 
-        if(!isset($data['shift_id'])) {
+        if (!isset($data['shift_id'])) {
             return ['Error' => "shift_id is missing"];
         }
 
         $shift = Shift::findOne(['id' => intval($data['shift_id'])]);
 
-        if($shift->user_id !== Application::$app->user->id) {
+        if ($shift->user_id !== Application::$app->user->id) {
             return ['Error' => "You can only trade your own shifts"];
         }
 
-        $relations = departmentRelation::findAll([[ 'department_id', '=', $shift->department_id ]]);
+        $relations = departmentRelation::findAll([['department_id', '=', $shift->department_id]]);
 
-        $userIds = implode(',', array_map(fn($u) => $u['user_id'], $relations));
+        $userIds = implode(',', array_map(fn ($u) => $u['user_id'], $relations));
 
-        return User::findAll(['id', 'IN', "($userIds)" ]);
+        return User::findAll([['id', 'IN', "($userIds)"]]);
     }
 }

@@ -140,7 +140,7 @@ abstract class DbModel extends Model
         foreach ($where as $section) {
             $whereStatement[] = $section[0] . ' ' . $section[1] . ' ' . $section[2];
         }
-        $whereStatement = implode("AND ", $whereStatement);
+        $whereStatement = implode(" AND ", $whereStatement);
 
         $statement = self::prepare("SELECT * FROM $tableName WHERE $whereStatement;");
         $statement->execute();
