@@ -32,7 +32,7 @@ class Vacant extends DbModel
 
     public function validate(?array $data = null): bool
     {
-        if ($data !== null && !in_array($data['type'], self::TYPES)) {
+        if ($data !== null && isset($data['type']) && !in_array($data['type'], self::TYPES)) {
             $this->addError("type", "Type must be one of: ". json_encode(self::TYPES));
         } else if (!in_array($this->type, self::TYPES)) {
             $this->addError("type", "Type must be one of: ". json_encode(self::TYPES));
@@ -53,7 +53,7 @@ class Vacant extends DbModel
 
     public function attributes(): array
     {
-        return ['user_id', 'department_id', 'from', 'to'];
+        return ['user_id', 'type', 'from', 'to'];
     }
 
     public function properties(): array

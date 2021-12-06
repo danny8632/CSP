@@ -44,6 +44,7 @@ use app\controllers\DepartmentRelationController;
 use app\controllers\UserController;
 use app\controllers\ShiftController;
 use app\controllers\TimestampController;
+use app\controllers\VacantController;
 use app\core\Application;
 
 require_once __DIR__.'/../vendor/autoload.php';
@@ -89,6 +90,11 @@ $app->router->get('/shift', [ShiftController::class, 'get']);
 $app->router->post('/shift', [ShiftController::class, 'post']);
 $app->router->put('/shift', [ShiftController::class, 'put']);
 $app->router->delete('/shift', [ShiftController::class, 'delete']);
+
+$app->router->get('/vacant', [VacantController::class, 'get']);
+$app->router->post('/vacant', [VacantController::class, 'post']);
+$app->router->put('/vacant', [VacantController::class, 'put']);
+$app->router->delete('/vacant', [VacantController::class, 'delete']);
 
 $app->router->get('/timestamp', [TimestampController::class, 'get']);
 $app->router->post('/timestamp', [TimestampController::class, 'post']);

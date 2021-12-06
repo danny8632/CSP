@@ -68,6 +68,11 @@ class VacantController extends Controller
         $vacant = new Vacant();
         $vacant->loadData($request->getBody());
 
+        if (!in_array($vacant->type, ['vacant_wish', 'vacation_wish'])) {
+            $vacant->addError("type", "Type must be one of: " . json_encode(['vacant_wish', 'vacation_wish']));
+        }
+
+
         if ($vacant->validate() && $vacant->save()) {
             return $vacant->getData();
         }
@@ -103,6 +108,10 @@ class VacantController extends Controller
         }
 
         $vacant->loadData($data);
+
+        if (!$user->isAdmin() && in_array($vacant->type, ['vacant', 'vacation'])) {
+            $vacant->addError("type", "Only admins can set type to one of: " . json_encode(['vacant', 'vacation']));
+        }
 
         if ($vacant->validate($data) && $vacant->update($data)) {
             return $vacant->getData();
