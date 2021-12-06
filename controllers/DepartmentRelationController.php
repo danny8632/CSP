@@ -47,7 +47,7 @@ class DepartmentRelationController extends Controller
         $departmentRelation->loadData($request->getBody());
 
         if ($departmentRelation->validate() && $departmentRelation->save()) {
-            return $departmentRelation;
+            return $departmentRelation->getData();
         }
 
         return $departmentRelation->formatErrors();

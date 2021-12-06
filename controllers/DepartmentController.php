@@ -82,7 +82,7 @@ class DepartmentController extends Controller
         $department->loadData($request->getBody());
 
         if ($department->validate() && $department->save()) {
-            return $department;
+            return $department->getData();
         }
 
         return $department->formatErrors();

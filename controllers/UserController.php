@@ -55,7 +55,7 @@ class UserController extends Controller
         $user->loadData($request->getBody());
 
         if ($user->validate() && $user->save()) {
-            return $user;
+            return $user->getData();
         }
 
         return $user->formatErrors();

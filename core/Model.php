@@ -155,7 +155,7 @@ abstract class Model
                         $_value = $value->getTimestamp();
                     }
 
-                    if(!isset($_value) || strval($_value) === '') {
+                    if(!isset($_value) || (strval($_value) === '' && !is_bool($value))) {
                         $this->addErrorForRule($attribute, self::RULE_REQUIRED);
                     }
                 }
