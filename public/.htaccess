@@ -5,7 +5,7 @@
 
     RewriteEngine On
 
-    RewriteCond %{HTTP_HOST} ^localhost [NC]
+    #RewriteCond %{HTTP_HOST} ^localhost [NC]
     #RewriteRule ^(.*)$ http://localhost/$1 [L,R=301,NC]
 
     # Handle Authorization Header
