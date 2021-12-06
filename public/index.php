@@ -43,6 +43,7 @@ use app\controllers\DepartmentController;
 use app\controllers\DepartmentRelationController;
 use app\controllers\UserController;
 use app\controllers\ShiftController;
+use app\controllers\ShiftTradeController;
 use app\controllers\TimestampController;
 use app\controllers\VacantController;
 use app\core\Application;
@@ -95,6 +96,15 @@ $app->router->get('/vacant', [VacantController::class, 'get']);
 $app->router->post('/vacant', [VacantController::class, 'post']);
 $app->router->put('/vacant', [VacantController::class, 'put']);
 $app->router->delete('/vacant', [VacantController::class, 'delete']);
+
+
+$app->router->get('/shiftTrade', [ShiftTradeController::class, 'get']);
+$app->router->post('/shiftTrade', [ShiftTradeController::class, 'post']);
+$app->router->delete('/shiftTrade', [ShiftTradeController::class, 'delete']);
+$app->router->post('/acceptTrade', [ShiftTradeController::class, 'acceptTrade']);
+$app->router->post('/declineTrade', [ShiftTradeController::class, 'declineTrade']);
+$app->router->get('/findPeople', [ShiftTradeController::class, 'findPeople']);
+
 
 $app->router->get('/timestamp', [TimestampController::class, 'get']);
 $app->router->post('/timestamp', [TimestampController::class, 'post']);

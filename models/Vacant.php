@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace app\models;
 
 use app\core\db\DbModel;
-use app\core\exception\NotFoundException;
 use DateTime;
-use Error;
 
 class Vacant extends DbModel
 {
