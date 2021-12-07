@@ -120,7 +120,7 @@ class ShiftController extends Controller
 
         $shift->loadData($data);
 
-        if ($shift->validate() && $shift->update()) {
+        if ($shift->validate($data) && $shift->update($data)) {
             return $shift->getData();
         }
 
