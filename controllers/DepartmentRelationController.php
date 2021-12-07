@@ -43,14 +43,39 @@ class DepartmentRelationController extends Controller
             throw new ForbiddenException;
         }
 
-        $departmentRelation = new DepartmentRelation();
-        $departmentRelation->loadData($request->getBody());
+        $data = $request->getBody();
 
-        if ($departmentRelation->validate() && $departmentRelation->save()) {
-            return $departmentRelation->getData();
+        if (!isset($data['user_id'])) {
+            return json_encode(["Error", "You must parse user_id"]);
         }
 
-        return $departmentRelation->formatErrors();
+        if (isset($data['department_ids'])) {
+            $response = [];
+
+            foreach ($data['department_ids'] as $depId) {
+                $data['department_id'] = $depId;
+
+                $departmentRelation = new DepartmentRelation();
+                $departmentRelation->loadData($data);
+
+                if ($departmentRelation->validate() && $departmentRelation->save()) {
+                    $response[] = $departmentRelation->getData();
+                } else {
+                    return $departmentRelation->formatErrors();
+                }
+            }
+
+            return $request;
+        } else {
+            $departmentRelation = new DepartmentRelation();
+            $departmentRelation->loadData($request->getBody());
+
+            if ($departmentRelation->validate() && $departmentRelation->save()) {
+                return $departmentRelation->getData();
+            }
+
+            return $departmentRelation->formatErrors();
+        }
     }
 
     public function delete(Request $request)
@@ -64,20 +89,20 @@ class DepartmentRelationController extends Controller
 
         $data = $request->getBody();
 
-        if (!isset($data['id'])) {
-            return "You must parse the id of the relation";
+        if (!isset($data['user_id']) || !isset($data['department_ids'])) {
+            return json_encode(["Error", "You must parse user_id and department_ids"]);
         }
 
-        $departmentRelation = DepartmentRelation::findOne(['id' => intval($data['id'])]);
+        $departmentRelations = DepartmentRelation::findAll([
+            [ 'user_id', '=', intval($data['user_id']) ],
+            [ 'department_id', 'IN', '(' . implode(',', $data['department_ids']) . ')' ]
+        ], false);
 
-        if ($departmentRelation === false) {
-            throw new NotFoundException;
+
+        foreach ($departmentRelations as $departmentRelation) {
+            $departmentRelation->delete();
         }
 
-        if ($departmentRelation->delete()) {
-            return true;
-        }
-
-        return $departmentRelation->formatErrors();
+        return true;
     }
 }

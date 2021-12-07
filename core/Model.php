@@ -129,7 +129,7 @@ abstract class Model
     public function validate(?array $data = null): bool
     {
         $classRules = $this->rules();
-        
+
         if ($data !== null) {
             $dataAttributes = array_keys($data);
             foreach ($classRules as $ruleKey => $ruleValue) {
@@ -138,7 +138,7 @@ abstract class Model
                 }
             }
         }
-        
+
         foreach ($classRules as $attribute => $rules) {
             $value = $data !== null ? $data[$attribute] : $this->{$attribute};
             foreach ($rules as $rule) {
@@ -151,11 +151,11 @@ abstract class Model
                 if ($ruleName === self::RULE_REQUIRED) {
                     $_value = $value;
 
-                    if(isset($_value) && is_a($value, DateTime::class)) {
+                    if (isset($_value) && is_a($value, DateTime::class)) {
                         $_value = $value->getTimestamp();
                     }
 
-                    if(!isset($_value) || (strval($_value) === '' && !is_bool($value))) {
+                    if (!isset($_value) || (strval($_value) === '' && !is_bool($value))) {
                         $this->addErrorForRule($attribute, self::RULE_REQUIRED);
                     }
                 }
@@ -184,7 +184,7 @@ abstract class Model
 
                     $query = "SELECT * FROM $tableName WHERE $uniqueAttr = :attr";
 
-                    if(isset($this->id) && $this->id > 0) {
+                    if (isset($this->id) && $this->id > 0) {
                         $query = "SELECT * FROM $tableName WHERE $uniqueAttr = :attr AND id != {$this->id}";
                     }
 
@@ -293,6 +293,12 @@ abstract class Model
     public function hasError(string $property): bool
     {
         return isset($this->errors[$property]);
+    }
+
+
+    public function hasErrors(): bool
+    {
+        return !empty($this->errors);
     }
 
 

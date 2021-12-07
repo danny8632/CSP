@@ -37,7 +37,6 @@ abstract class DbModel extends Model
 
         $statement = self::prepare("INSERT INTO $tableName (`$attributesSql`) VALUES ($params);");
 
-
         foreach ($attributes as $attribute) {
             $value = $this->{$attribute};
 
@@ -132,7 +131,7 @@ abstract class DbModel extends Model
     }
 
 
-    public static function findAll(array $where = []): array
+    public static function findAll(array $where = [], bool $format = true): array
     {
         $tableName  = (new static)->tableName();
 
@@ -146,7 +145,7 @@ abstract class DbModel extends Model
         $statement->execute();
         $records = $statement->fetchAll();
 
-        return self::parseDbData($records);
+        return self::parseDbData($records, $format);
     }
 
 

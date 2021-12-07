@@ -20,11 +20,11 @@ class m0007_DepartmentRelation
             FOREIGN KEY (user_id)
                 REFERENCES Users(id)
                 ON UPDATE NO ACTION
-                ON DELETE CASCADE,
+                ON DELETE NO ACTION,
             FOREIGN KEY (department_id)
                 REFERENCES Departments(id)
                 ON UPDATE NO ACTION
-                ON DELETE CASCADE
+                ON DELETE NO ACTION
             ) ENGINE = InnoDB;";
         $db->pdo->exec($SQL);
     }
