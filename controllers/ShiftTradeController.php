@@ -63,7 +63,7 @@ class ShiftTradeController extends Controller
             [],
             ShiftTrade::findAll([['currentowner', '=', $user->id]]),
             ShiftTrade::findAll([['newowner', '=', $user->id]])
-        );;
+        );
     }
 
     public function post(Request $request)
