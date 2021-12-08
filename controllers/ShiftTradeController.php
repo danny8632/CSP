@@ -19,7 +19,7 @@ class ShiftTradeController extends Controller
 {
     public function __construct()
     {
-        $this->registerMiddleware(new AuthMiddleware(['get', 'post', 'put', 'delete']));
+        $this->registerMiddleware(new AuthMiddleware(['get', 'post', 'delete', 'acceptTrade', 'declineTrade', 'findPeople']));
     }
 
     public function get(Request $request)
