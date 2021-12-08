@@ -115,9 +115,7 @@ class ShiftTradeController extends Controller
             return "You must specify id or shift_id of the trade";
         }
 
-        exit(json_encode($ShiftTrade));
-
-        if (!$user->isAdmin() || $ShiftTrade->currentowner !== $user->id) {
+        if (!$user->isAdmin() && $ShiftTrade->currentowner !== $user->id) {
             throw new ForbiddenException;
         }
 

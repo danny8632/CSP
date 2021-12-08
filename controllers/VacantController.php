@@ -129,7 +129,7 @@ class VacantController extends Controller
             throw new NotFoundException;
         }
 
-        if (!$user->isAdmin() || $vacant->user_id !== $user->id) {
+        if (!$user->isAdmin() && $vacant->user_id !== $user->id) {
             throw new ForbiddenException;
         }
 
