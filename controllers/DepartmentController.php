@@ -56,6 +56,8 @@ class DepartmentController extends Controller
                 return [];
             }
 
+            exit(json_encode(['id', 'IN', '(' . implode(',', array_map(fn ($realtion) => $realtion->department_id, $relations)) . ')']));
+
             return Department::findAll([['id', 'IN', '(' . implode(',', array_map(fn ($realtion) => $realtion->department_id, $relations)) . ')']]);
         }
 
