@@ -27,12 +27,20 @@ class TimestampController extends Controller
         }
 
         $data = $request->getBody();
-        
-        if (!isset($data['shift_id'])) {
-            return "You must specify shift_id";
+
+        if (isset($data['shift_id'])) {
+            return Timestamp::findAll([['shift_id', '=', $data['shift_id']]]);
         }
 
-        return Timestamp::findAll([['shift_id', '=', $data['shift_id']]]);
+        $shiftIds = array_map(fn ($shift) => $shift['id'], Shift::findAll([['user_id', '=', Application::$app->user->id]]));
+
+        if (count($shiftIds) === 0) {
+            return [];
+        }
+
+        return Timestamp::findAll([
+            ['shift_id', 'IN', '(' . implode(',', $shiftIds) . ')']
+        ]);
     }
 
     public function post(Request $request)
@@ -62,7 +70,7 @@ class TimestampController extends Controller
         if ($timestamp->validate($request->getBody()) && $timestamp->save()) {
             return $timestamp->getData();
         }
-        
+
         return $timestamp->formatErrors();
     }
 
@@ -71,7 +79,7 @@ class TimestampController extends Controller
         if ($request->isPut() === false) {
             throw new NotFoundException;
         }
-        
+
         $data = $request->getBody();
 
         if (!isset($data['shift_id'])) {
@@ -98,7 +106,7 @@ class TimestampController extends Controller
                 return $timestamp->getData();
             }
         }
-    
+
         return $timestamp->formatErrors();
     }
 }
