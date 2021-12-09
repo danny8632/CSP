@@ -63,8 +63,6 @@ class SealedShiftsController extends Controller
 
         $shift_id = intval($data['shift_id']);
         $sealedShift = new SealedShift();
-        $sealedShift->loadData($data);
-
 
         if(count(SealedShift::findAll([[ 'shift_id', '=', $shift_id ]])) > 0) {
             throw new \Exception("This seal already exists", 403);
@@ -74,14 +72,25 @@ class SealedShiftsController extends Controller
 
         $sealedShift->loadData([
             'orig_from' => $shift->from,
-            'orig_to'   => $shift->to
+            'orig_to'   => $shift->to,
+            'shift_id' => $shift_id
         ]);
 
-        if ($sealedShift->validate() && $sealedShift->save()) {
-            return $sealedShift->getData();
-        }
+        $newShiftData = [
+            'from' => $data['from'] ?? $shift->from,
+            'to' => $data['from'] ?? $shift->from,
+        ];
+        $shift->loadData($newShiftData);
 
-        return $sealedShift->formatErrors();
+        if($shift->validate($newShiftData) && $shift->update($newShiftData))
+        {
+            if ($sealedShift->validate() && $sealedShift->save()) {
+                return $sealedShift->getData();
+            }
+
+            return $sealedShift->formatErrors();
+        }
+        return $shift->formatErrors();
     }
 
     public function delete(Request $request)
@@ -99,15 +108,18 @@ class SealedShiftsController extends Controller
         }
 
         $sealedShift = SealedShift::findOne(['id' => intval($data['id'])]);
+        $shift = Shift::findOne(['id' => $sealedShift->shift_id]);
 
-        if ($sealedShift === false) {
-            throw new NotFoundException;
+        $newShiftData = [
+            'from' => $sealedShift['orig_from'] ?? $shift->from,
+            'to' => $sealedShift['orig_to'] ?? $shift->from,
+        ];
+
+        $shift->loadData($newShiftData);
+        if($shift->validate($newShiftData) && $shift->update($newShiftData))
+        {
+            return $sealedShift->delete();
         }
-
-        if ($sealedShift->delete()) {
-            return true;
-        }
-
-        return $sealedShift->formatErrors();
+        return $shift->formatErrors();
     }
 }
