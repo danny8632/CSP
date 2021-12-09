@@ -41,6 +41,7 @@ if($isApiCall === false) {
 use app\controllers\AuthController;
 use app\controllers\DepartmentController;
 use app\controllers\DepartmentRelationController;
+use app\controllers\SealedShiftsController;
 use app\controllers\UserController;
 use app\controllers\ShiftController;
 use app\controllers\ShiftTradeController;
@@ -109,5 +110,9 @@ $app->router->get('/findPeople', [ShiftTradeController::class, 'findPeople']);
 $app->router->get('/timestamp', [TimestampController::class, 'get']);
 $app->router->post('/timestamp', [TimestampController::class, 'post']);
 $app->router->put('/timestamp', [TimestampController::class, 'put']);
+
+$app->router->get('/timestamp', [SealedShiftsController::class, 'get']);
+$app->router->post('/timestamp', [SealedShiftsController::class, 'post']);
+$app->router->delete('/timestamp', [SealedShiftsController::class, 'delete']);
 
 $app->run();
