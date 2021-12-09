@@ -111,8 +111,8 @@ $app->router->get('/timestamp', [TimestampController::class, 'get']);
 $app->router->post('/timestamp', [TimestampController::class, 'post']);
 $app->router->put('/timestamp', [TimestampController::class, 'put']);
 
-$app->router->get('/timestamp', [SealedShiftsController::class, 'get']);
-$app->router->post('/timestamp', [SealedShiftsController::class, 'post']);
-$app->router->delete('/timestamp', [SealedShiftsController::class, 'delete']);
+$app->router->get('/sealedShifts', [SealedShiftsController::class, 'get']);
+$app->router->post('/sealedShifts', [SealedShiftsController::class, 'post']);
+$app->router->delete('/sealedShifts', [SealedShiftsController::class, 'delete']);
 
 $app->run();
