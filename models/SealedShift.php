@@ -13,7 +13,8 @@ class SealedShift extends DbModel
     public int $shift_id        = 0;
     public ?DateTime $orig_from = null;
     public ?DateTime $orig_to   = null;
-
+    public array $shift;
+    public array $department;
 
     public function tableName(): string
     {
@@ -24,6 +25,18 @@ class SealedShift extends DbModel
     {
         return 'id';
     }
+
+    public function getData(): array
+    {
+        $shift = Shift::findOne(['id' => $this->shift_id]);
+        $department = Department::findOne(['id' => $shift->department_id]);
+
+        $this->shift = $shift->getData();
+        $this->department = $department->getData();
+
+        return parent::getData();
+    }
+
 
     public function rules(): array
     {
@@ -41,6 +54,6 @@ class SealedShift extends DbModel
 
     public function properties(): array
     {
-        return ['id', 'shift_id', 'orig_from', 'orig_to'];
+        return ['id', 'shift_id', 'orig_from', 'orig_to', 'shift', 'department'];
     }
 }
