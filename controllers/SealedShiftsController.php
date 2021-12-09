@@ -118,7 +118,8 @@ class SealedShiftsController extends Controller
         $shift->loadData($newShiftData);
         if($shift->validate($newShiftData) && $shift->update($newShiftData))
         {
-            return $sealedShift->delete();
+            $sealedShift->delete();
+            return $shift->getData();
         }
         return $shift->formatErrors();
     }
