@@ -80,10 +80,11 @@ class SealedShiftsController extends Controller
         $newShiftData = [
             'from' => $data['from'] ?? $shiftData['from'],
             'to' => $data['to'] ?? $shiftData['to'],
+            'id' => $shift_id
         ];
         $shift->loadData($newShiftData);
 
-        if($shift->validate() && $shift->update())
+        if($shift->validate($newShiftData) && $shift->update($newShiftData))
         {
             if ($sealedShift->validate() && $sealedShift->save()) {
                 return $sealedShift->getData();
@@ -114,7 +115,8 @@ class SealedShiftsController extends Controller
         $sealedShiftData = $sealedShift->getData();
         $newShiftData = [
             'from' => $sealedShiftData['orig_from'],
-            'to' => $sealedShiftData['orig_to']
+            'to' => $sealedShiftData['orig_to'],
+            'id' => $sealedShift->shift_id
         ];
 
         $shift->loadData($newShiftData);
