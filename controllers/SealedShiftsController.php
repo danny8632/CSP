@@ -83,7 +83,7 @@ class SealedShiftsController extends Controller
         ];
         $shift->loadData($newShiftData);
 
-        if($shift->validate($newShiftData) && $shift->update($newShiftData))
+        if($shift->validate() && $shift->update())
         {
             if ($sealedShift->validate() && $sealedShift->save()) {
                 return $sealedShift->getData();
@@ -118,7 +118,7 @@ class SealedShiftsController extends Controller
         ];
 
         $shift->loadData($newShiftData);
-        if($shift->validate($newShiftData) && $shift->update($newShiftData))
+        if($shift->validate() && $shift->update())
         {
             $sealedShift->delete();
             return $shift->getData();
