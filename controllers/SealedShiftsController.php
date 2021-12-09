@@ -70,15 +70,16 @@ class SealedShiftsController extends Controller
 
         $shift = Shift::findOne(['id' => $shift_id]);
 
+        $shiftData = $shift->getData();
         $sealedShift->loadData([
-            'orig_from' => $shift->from,
-            'orig_to'   => $shift->to,
+            'orig_from' => $shiftData['from'],
+            'orig_to'   => $shiftData['to'],
             'shift_id' => $shift_id
         ]);
 
         $newShiftData = [
-            'from' => $data['from'] ?? $shift->from,
-            'to' => $data['from'] ?? $shift->from,
+            'from' => $data['from'] ?? $shiftData['from'],
+            'to' => $data['to'] ?? $shiftData['to'],
         ];
         $shift->loadData($newShiftData);
 
@@ -110,9 +111,10 @@ class SealedShiftsController extends Controller
         $sealedShift = SealedShift::findOne(['id' => intval($data['id'])]);
         $shift = Shift::findOne(['id' => $sealedShift->shift_id]);
 
+        $sealedShiftData = $sealedShift->getData();
         $newShiftData = [
-            'from' => $sealedShift['orig_from'] ?? $shift->from,
-            'to' => $sealedShift['orig_to'] ?? $shift->from,
+            'from' => $sealedShiftData['orig_from'],
+            'to' => $sealedShiftData['orig_to']
         ];
 
         $shift->loadData($newShiftData);
