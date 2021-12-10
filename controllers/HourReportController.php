@@ -41,8 +41,8 @@ class HourReportController extends Controller
         $depIds = '(\'' . implode('\',\'', array_map('intval', $data['departments'])) . '\')';
 
         $shifts = Shift::findAll([
-            ['from', '>', $data['from']],
-            ['from', '<', $data['from']],
+            ['from', '>', '\''.$data['from'].'\''],
+            ['to', '<', '\''.$data['to'].'\''],
             ['department_id', 'IN', $depIds]
         ]);
 
