@@ -116,8 +116,4 @@ $app->router->get('/sealedShifts', [SealedShiftsController::class, 'get']);
 $app->router->post('/sealedShifts', [SealedShiftsController::class, 'post']);
 $app->router->delete('/sealedShifts', [SealedShiftsController::class, 'delete']);
 
-
-
-$app->router->post('/hourReport', [HourReportController::class, 'post']);
-
 $app->run();
