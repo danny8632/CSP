@@ -59,6 +59,10 @@ class HourReportController extends Controller
             foreach ($shifts as $_key => $shift) {
                 if($shift['user_id'] !== $user['id']) continue;
                 $shift['sealed'] = array_filter($sealedShifts, fn($ss) => $ss['shift_id'] === $shift['id'])[0] ?? null;
+                
+                if(isset($shift['sealed']['shift'])) unset($shift['sealed']['shift']);
+                if(isset($shift['sealed']['department'])) unset($shift['sealed']['department']);
+
                 $users[$key]['shifts'][] = $shift;
             }
         }
