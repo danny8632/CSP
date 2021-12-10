@@ -41,6 +41,7 @@ if($isApiCall === false) {
 use app\controllers\AuthController;
 use app\controllers\DepartmentController;
 use app\controllers\DepartmentRelationController;
+use app\controllers\HourReportController;
 use app\controllers\SealedShiftsController;
 use app\controllers\UserController;
 use app\controllers\ShiftController;
@@ -114,5 +115,9 @@ $app->router->put('/timestamp', [TimestampController::class, 'put']);
 $app->router->get('/sealedShifts', [SealedShiftsController::class, 'get']);
 $app->router->post('/sealedShifts', [SealedShiftsController::class, 'post']);
 $app->router->delete('/sealedShifts', [SealedShiftsController::class, 'delete']);
+
+
+
+$app->router->post('/hourReport', [HourReportController::class, 'post']);
 
 $app->run();
