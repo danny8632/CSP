@@ -33,7 +33,7 @@ $serverRequestPath = $_SERVER['REQUEST_URI'] ?? '/';
 $isApiCall = strpos($serverRequestPath, 'api');
 
 if($isApiCall === false) {
-    return json_encode(["Error" => "Try using /api"]);
+    echo json_encode(["Error" => "Try using /api"]);
 }
 
 
